@@ -53,10 +53,12 @@ int main(int argc, char** argv)
   	catch (const LexerException& lexerException)
   	{
   		printf("Lexer is asking for excuse. %s", lexerException.getMessage().c_str());
+  		return -1;
   	}
   	catch (const ParserException& parserException)
   	{
   		printf("Parser is asking for excuse. %s", parserException.getMessage().c_str());
+  		return -1;
   	}
 
 	// ** Generating the code **
