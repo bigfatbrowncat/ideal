@@ -10,6 +10,8 @@
 #include <list>
 #include <string>
 
+#include "LexerException.h"
+
 using namespace std;
 
 /* LexerItem */
@@ -32,21 +34,21 @@ void LexerTreeItem::doLexing(list<LexerTreeItem*>& nextIteration)
 				if (braces.back() == brRound)
 					braces.pop_back();
 				else
-					throw ERROR_LEXER_UNEXPECTED_CLOSING_BRACE;
+					throw UnexpectedClosingRoundBraceException();
 			}
 			else if (ch == ']')
 			{
 				if (braces.back() == brSquare)
 					braces.pop_back();
 				else
-					throw ERROR_LEXER_UNEXPECTED_CLOSING_BRACE;
+					throw UnexpectedClosingSquareBraceException();
 			}
 			else if (ch == '}')
 			{
 				if (braces.back() == brCurly)
 					braces.pop_back();
 				else
-					throw ERROR_LEXER_UNEXPECTED_CLOSING_BRACE;
+					throw UnexpectedClosingCurlyBraceException();
 			}
 		}
 
@@ -88,7 +90,7 @@ void LexerTreeItem::doLexing(list<LexerTreeItem*>& nextIteration)
 				curItemText = innerText[i];
 			}
 			else
-				throw ERROR_LEXER_UNEXPECTED_CHAR;
+				throw UnexpectedCharLexerException(innerText[i]);
 		}
 		else if (curState == ident)
 		{
@@ -131,7 +133,7 @@ void LexerTreeItem::doLexing(list<LexerTreeItem*>& nextIteration)
 				curItemText = "";
 			}
 			else
-				throw ERROR_LEXER_UNEXPECTED_CHAR;
+				throw UnexpectedCharLexerException(innerText[i]);
 		}
 		else if (curState == oper)
 		{
@@ -199,7 +201,7 @@ void LexerTreeItem::doLexing(list<LexerTreeItem*>& nextIteration)
 				curItemText = "";
 			}
 			else
-				throw ERROR_LEXER_UNEXPECTED_CHAR;
+				throw UnexpectedCharLexerException(innerText[i]);
 		}
 		else if (curState == number)
 		{
@@ -242,7 +244,7 @@ void LexerTreeItem::doLexing(list<LexerTreeItem*>& nextIteration)
 				curItemText = "";
 			}
 			else
-				throw ERROR_LEXER_UNEXPECTED_CHAR;
+				throw UnexpectedCharLexerException(innerText[i]);
 		}
 		else if (curState == inbraces)
 		{
@@ -272,15 +274,16 @@ void LexerTreeItem::doLexing(list<LexerTreeItem*>& nextIteration)
 	}
 
 	// Checking: if we don't have outer braces but we have only one inner item
-	//            and it's without braces too, it is our copy, so we remove it.
+	//           and it's without braces too, it is our copy, so we remove it
+	//           from the next iteration.
 	if (outerBraces == brNone && innerItems.size() == 1 && innerItems.back().outerBraces == brNone)
 	{
 		nextIteration.remove(&innerItems.front());
-		innerItems.clear();
+//		innerItems.clear();
 	}
 
 	if (braces.thereAreOpened())
-		throw ERROR_LEXER_MISSING_CLOSING_BRACE;
+		throw MissingClosingBraceException();
 }
 
 /* Lexer */

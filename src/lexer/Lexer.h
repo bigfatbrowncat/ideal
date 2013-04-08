@@ -13,10 +13,6 @@
 
 using namespace std;
 
-#define ERROR_LEXER_UNEXPECTED_CHAR					1
-#define ERROR_LEXER_UNEXPECTED_CLOSING_BRACE		2
-#define ERROR_LEXER_MISSING_CLOSING_BRACE			3
-
 enum Brace { brNone, brRound, brSquare, brCurly };
 
 class LexerTreeItem

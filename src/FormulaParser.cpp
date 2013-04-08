@@ -85,7 +85,7 @@ ParserNode* ExpressionParser::parse(const LexerTreeItem& source, ParserVariables
 		}
 		else
 		{
-			throw UNDECLARED_IDENTIFIER;
+			throw InvalidTokenParserException((*iter).getInnerText());
 		}
 	}
 
@@ -114,7 +114,7 @@ ParserNode* ExpressionParser::parse(const LexerTreeItem& source, ParserVariables
 
 			if (highest_priority_index > items.size() - 2 || items[highest_priority_index + 1].type != ParserItemWrapper::tOperand)
 			{
-				throw WANTED_OPERAND;
+				throw OperandWantedParserException();
 			}
 
 			UnaryOperationParserNode* fuo = new UnaryOperationParserNode(items[highest_priority_index + 1].parserOperand,
@@ -129,11 +129,11 @@ ParserNode* ExpressionParser::parse(const LexerTreeItem& source, ParserVariables
 
 			if (highest_priority_index < 1 || items[highest_priority_index - 1].type != ParserItemWrapper::tOperand)
 			{
-				throw WANTED_OPERAND;
+				throw OperandWantedParserException();
 			}
 			if (highest_priority_index > items.size() - 2 || items[highest_priority_index + 1].type != ParserItemWrapper::tOperand)
 			{
-				throw WANTED_OPERAND;
+				throw OperandWantedParserException();
 			}
 
 			// Replacing the binary operation part with a single object
@@ -149,7 +149,7 @@ ParserNode* ExpressionParser::parse(const LexerTreeItem& source, ParserVariables
 
 	if (items.front().type != ParserItemWrapper::tOperand)
 	{
-		throw WANTED_OPERAND;
+		throw OperandWantedParserException();
 	}
 
 	return items.front().parserOperand;

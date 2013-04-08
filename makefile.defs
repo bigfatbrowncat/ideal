@@ -1,0 +1,6 @@
+#
+#  This file is included by the defauld Eclipse makefile
+#  it should fix the RM variable in MinGW environment
+#
+
+RM := rm -rf

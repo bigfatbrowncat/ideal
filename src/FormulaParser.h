@@ -15,13 +15,12 @@
 #include <llvm/IRBuilder.h>
 #include <llvm/Constants.h>
 
-#include "Lexer.h"
+#include "lexer/Lexer.h"
 #include "ParserNode.h"
+#include "ParserVariables.h"
 
 using namespace std;
 using namespace llvm;
-
-#define UNDECLARED_IDENTIFIER		5
 
 enum ParserOperator
 {
