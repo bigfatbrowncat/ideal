@@ -17,14 +17,14 @@ using namespace std;
 #define ERROR_LEXER_UNEXPECTED_CLOSING_BRACE		2
 #define ERROR_LEXER_MISSING_CLOSING_BRACE			3
 
-enum brace { BR_NONE, BR_ROUND, BR_SQUARE, BR_CURLY };
+enum Brace { brNone, brRound, brSquare, brCurly };
 
 class LexerTreeItem
 {
 private:
 	string innerText;
 	list<LexerTreeItem> innerItems;
-	brace outerBraces;
+	Brace outerBraces;
 
 	bool isDigit(char ch)
 	{
@@ -53,24 +53,24 @@ private:
 
 	void extractBraces()
 	{
-		outerBraces = BR_NONE;
+		outerBraces = brNone;
 		if (innerText.length() > 1)
 		{
 			if (innerText[0] == '(' && innerText[innerText.length() - 1] == ')')
 			{
-				outerBraces = BR_ROUND;
+				outerBraces = brRound;
 			}
 			else if (innerText[0] == '[' && innerText[innerText.length() - 1] == ']')
 			{
-				outerBraces = BR_SQUARE;
+				outerBraces = brSquare;
 			}
 			else if (innerText[0] == '{' && innerText[innerText.length() - 1] == '}')
 			{
-				outerBraces = BR_CURLY;
+				outerBraces = brCurly;
 			}
 		}
 
-		if (outerBraces != BR_NONE)
+		if (outerBraces != brNone)
 		{
 			innerText = innerText.substr(1, innerText.length() - 2);
 		}
@@ -85,7 +85,7 @@ public:
 
 	const string& getInnerText() const { return innerText; }
 	const list<LexerTreeItem>& getInnerItems() const { return innerItems; }
-	brace getOuterBraces() const { return outerBraces; }
+	Brace getOuterBraces() const { return outerBraces; }
 
 	void doLexing(list<LexerTreeItem*>& nextIteration);
 };

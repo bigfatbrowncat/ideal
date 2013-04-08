@@ -11,71 +11,76 @@ struct ParserItemWrapper
 {
 	enum Type { tOperand, tOperator };
 
-	FormulaItem* opd;
-	FormulaOperator opt;
+	ParserNode* parserOperand;
+	ParserOperator parserOperator;
 
 	Type type;
 
-	static ParserItemWrapper withOperand(FormulaItem* operand)
+	static ParserItemWrapper withOperand(ParserNode* parserOperand)
 	{
 		ParserItemWrapper res;
-		res.opd = operand;
+		res.parserOperand = parserOperand;
 		res.type = tOperand;
 		return res;
 	}
-	static ParserItemWrapper withOperator(FormulaOperator opertor)
+	static ParserItemWrapper withOperator(ParserOperator parserOperator)
 	{
 		ParserItemWrapper res;
-		res.opt = opertor;
+		res.parserOperator = parserOperator;
 		res.type = tOperator;
 		return res;
 	}
 };
 
-FormulaItem* FormulaParser::parse(const LexerTreeItem& source, const OperatorPriorities& priorities, Variables& vars)
+ParserNode* ExpressionParser::parse(const LexerTreeItem& source, ParserVariables& vars)
 {
-	vector<ParserItemWrapper> operands;
+	vector<ParserItemWrapper> items;
 
 	bool previousIsOperand = false;
 	for (list<LexerTreeItem>::const_iterator iter = source.getInnerItems().begin(); iter != source.getInnerItems().end(); iter++)
 	{
 		if ((*iter).getInnerText() == "+")
 		{
-			operands.push_back(ParserItemWrapper::withOperator(foAdd));
+			items.push_back(ParserItemWrapper::withOperator(foAdd));
 			previousIsOperand = false;
 		}
 		else if ((*iter).getInnerText() == "-")
 		{
 			if (previousIsOperand)
 			{
-				operands.push_back(ParserItemWrapper::withOperator(foSubtract));
+				items.push_back(ParserItemWrapper::withOperator(foSubtract));
 			}
 			else
 			{
-				operands.push_back(ParserItemWrapper::withOperator(foUnaryMinus));
+				items.push_back(ParserItemWrapper::withOperator(foUnaryMinus));
 			}
 			previousIsOperand = false;
 		}
 		else if ((*iter).getInnerText() == "*")
 		{
-			operands.push_back(ParserItemWrapper::withOperator(foMultiply));
+			items.push_back(ParserItemWrapper::withOperator(foMultiply));
 			previousIsOperand = false;
 		}
 		else if ((*iter).getInnerText() == "/")
 		{
-			operands.push_back(ParserItemWrapper::withOperator(foDivide));
+			items.push_back(ParserItemWrapper::withOperator(foDivide));
 			previousIsOperand = false;
 		}
-		else if (ConstantFormulaItem::isParseable((*iter).getInnerText()))
+		else if ((*iter).getOuterBraces() == brRound)
 		{
-			ConstantFormulaItem* cfi = new ConstantFormulaItem(ConstantFormulaItem::parse((*iter).getInnerText(), vars));
-			operands.push_back(ParserItemWrapper::withOperand(cfi));
+			items.push_back(ParserItemWrapper::withOperand(parse(*iter, vars)));
+			previousIsOperand = true;
+		}
+		else if (ConstantParserNode::isParseable((*iter).getInnerText()))
+		{
+			ConstantParserNode* cfi = new ConstantParserNode(ConstantParserNode::parse((*iter).getInnerText(), vars));
+			items.push_back(ParserItemWrapper::withOperand(cfi));
 			previousIsOperand = true;
 		}
 		else if (vars.contains((*iter).getInnerText()))
 		{
-			VariableFormulaItem* vfi = new VariableFormulaItem((*iter).getInnerText(), vars);
-			operands.push_back(ParserItemWrapper::withOperand(vfi));
+			RValueParserNode* vfi = new RValueParserNode((*iter).getInnerText(), vars);
+			items.push_back(ParserItemWrapper::withOperand(vfi));
 			previousIsOperand = true;
 		}
 		else
@@ -85,77 +90,76 @@ FormulaItem* FormulaParser::parse(const LexerTreeItem& source, const OperatorPri
 	}
 
 
-	while (operands.size() > 1)
+	while (items.size() > 1)
 	{
 		size_t highest_priority_index = 0;
 		int highest_priority = 0;
 
-		for (size_t i = 0; i < operands.size(); i++)
+		for (size_t i = 0; i < items.size(); i++)
 		{
-			if (operands[i].type == ParserItemWrapper::tOperator)
+			if (items[i].type == ParserItemWrapper::tOperator)
 			{
-				if (priorities.priorityOf(operands[i].opt) > highest_priority)
+				if (priorities.priorityOf(items[i].parserOperator) > highest_priority)
 				{
-					highest_priority = priorities.priorityOf(operands[i].opt);
+					highest_priority = priorities.priorityOf(items[i].parserOperator);
 
 					highest_priority_index = i;
 				}
 			}
 		}
 
-		if (operands[highest_priority_index].opt == foUnaryMinus)
+		if (items[highest_priority_index].parserOperator == foUnaryMinus)
 		{
 			// Unary operators
 
-			if (highest_priority_index > operands.size() - 2 || operands[highest_priority_index + 1].type != ParserItemWrapper::tOperand)
+			if (highest_priority_index > items.size() - 2 || items[highest_priority_index + 1].type != ParserItemWrapper::tOperand)
 			{
 				throw WANTED_OPERAND;
 			}
 
-			FormulaUnaryOperation* fuo = new FormulaUnaryOperation(operands[highest_priority_index + 1].opd,
-			                                                       operands[highest_priority_index].opt,
+			UnaryOperationParserNode* fuo = new UnaryOperationParserNode(items[highest_priority_index + 1].parserOperand,
+			                                                       items[highest_priority_index].parserOperator,
 			                                                       vars);
-			operands.erase(operands.begin() + highest_priority_index + 1);
-			operands[highest_priority_index] = ParserItemWrapper::withOperand(fuo);
+			items.erase(items.begin() + highest_priority_index + 1);
+			items[highest_priority_index] = ParserItemWrapper::withOperand(fuo);
 		}
 		else
 		{
 			// Binary operators
 
-			if (highest_priority_index < 1 || operands[highest_priority_index - 1].type != ParserItemWrapper::tOperand)
+			if (highest_priority_index < 1 || items[highest_priority_index - 1].type != ParserItemWrapper::tOperand)
 			{
 				throw WANTED_OPERAND;
 			}
-			if (highest_priority_index > operands.size() - 2 || operands[highest_priority_index + 1].type != ParserItemWrapper::tOperand)
+			if (highest_priority_index > items.size() - 2 || items[highest_priority_index + 1].type != ParserItemWrapper::tOperand)
 			{
 				throw WANTED_OPERAND;
 			}
 
 			// Replacing the binary operation part with a single object
-			FormulaBinaryOperation* fbo = new FormulaBinaryOperation(operands[highest_priority_index - 1].opd,
-																	 operands[highest_priority_index].opt,
-																	 operands[highest_priority_index + 1].opd,
+			BinaryOperationParserNode* fbo = new BinaryOperationParserNode(items[highest_priority_index - 1].parserOperand,
+																	 items[highest_priority_index].parserOperator,
+																	 items[highest_priority_index + 1].parserOperand,
 																	 vars);
-			operands.erase(operands.begin() + highest_priority_index + 1);
-			operands.erase(operands.begin() + highest_priority_index);
-			operands[highest_priority_index - 1] = ParserItemWrapper::withOperand(fbo);
+			items.erase(items.begin() + highest_priority_index + 1);
+			items.erase(items.begin() + highest_priority_index);
+			items[highest_priority_index - 1] = ParserItemWrapper::withOperand(fbo);
 		}
 	}
 
-	if (operands.front().type != ParserItemWrapper::tOperand)
+	if (items.front().type != ParserItemWrapper::tOperand)
 	{
 		throw WANTED_OPERAND;
 	}
 
-	return operands.front().opd;
+	return items.front().parserOperand;
 }
 
-FormulaParser::FormulaParser(const LexerTreeItem& lti, const OperatorPriorities& oprior, Variables& vars)
+ExpressionParser::ExpressionParser(const ParserOperatorPriorities& priorities) : priorities(priorities)
 {
-	root = parse(lti, oprior, vars);
 }
 
-FormulaParser::~FormulaParser() {
+ExpressionParser::~ExpressionParser() {
 	// TODO Auto-generated destructor stub
 }
 

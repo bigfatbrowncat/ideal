@@ -11,130 +11,64 @@
 #include <map>
 #include <string>
 
-#include "llvm/Value.h"
-#include "llvm/IRBuilder.h"
-#include "llvm/Constants.h"
+#include <llvm/Value.h>
+#include <llvm/IRBuilder.h>
+#include <llvm/Constants.h>
 
 #include "Lexer.h"
+#include "ParserNode.h"
 
 using namespace std;
 using namespace llvm;
 
-#define WANTED_OPERATOR				1
-#define WANTED_OPERAND				2
-
-#define VARIABLE_UNDEFINED			3
-#define VARIABLE_REDEFINITION		4
-
 #define UNDECLARED_IDENTIFIER		5
 
-enum FormulaOperator
+enum ParserOperator
 {
 	foUnaryMinus,
 	foAdd, foSubtract, foMultiply, foDivide
 };
 
-class OperatorPriorities
+class ParserOperatorPriorities
 {
 private:
-	map<FormulaOperator, int> priorities;
+	map<ParserOperator, int> priorities;
 public:
-	OperatorPriorities()
+	ParserOperatorPriorities()
 	{
-		priorities.insert(pair<FormulaOperator, int>(foUnaryMinus, 3));
-		priorities.insert(pair<FormulaOperator, int>(foMultiply, 2));
-		priorities.insert(pair<FormulaOperator, int>(foDivide, 2));
-		priorities.insert(pair<FormulaOperator, int>(foAdd, 1));
-		priorities.insert(pair<FormulaOperator, int>(foSubtract, 1));
+		priorities.insert(pair<ParserOperator, int>(foUnaryMinus, 3));
+		priorities.insert(pair<ParserOperator, int>(foMultiply, 2));
+		priorities.insert(pair<ParserOperator, int>(foDivide, 2));
+		priorities.insert(pair<ParserOperator, int>(foAdd, 1));
+		priorities.insert(pair<ParserOperator, int>(foSubtract, 1));
 	}
 
-	int priorityOf(FormulaOperator oper) const
+	int priorityOf(ParserOperator oper) const
 	{
 		return priorities.at(oper);
 	}
 };
 
-class Variables
-{
-private:
-	map<string, AllocaInst*> values;
-public:
-	void add(const string& name, AllocaInst* variable)
-	{
-		if (values.find(name) == values.end())
-		{
-			values.insert(pair<string, AllocaInst*>(name, variable));
-		}
-		else
-		{
-			throw VARIABLE_REDEFINITION;
-		}
-	}
-
-	void set(const string& name, AllocaInst* variable)
-	{
-		map<string, AllocaInst*>::iterator iter = values.find(name);
-		if (iter == values.end())
-		{
-			throw VARIABLE_UNDEFINED;
-		}
-		else
-		{
-			(*iter).second = variable;
-		}
-	}
-
-	AllocaInst* get(const string& name)
-	{
-		map<string, AllocaInst*>::iterator iter = values.find(name);
-		if (iter == values.end())
-		{
-			throw VARIABLE_UNDEFINED;
-		}
-		else
-		{
-			return (*iter).second;
-		}
-	}
-
-	bool contains(const string& name)
-	{
-		return values.find(name) != values.end();
-	}
-};
-
-class FormulaItem
-{
-private:
-	Variables& vars;
-protected:
-	FormulaItem(Variables& vars) : vars(vars) {}
-	virtual ~FormulaItem() {}
-public:
-	virtual Value* generateLLVMCode(IRBuilder<>& builder) = 0;
-	Variables& getVariables() { return vars; }
-};
-
-class ConstantFormulaItem : public FormulaItem
+class ConstantParserNode : public ParserNode
 {
 private:
 	double value;
 public:
 	virtual Value* generateLLVMCode(IRBuilder<>& builder)
 	{
-		Type* doubleType = Type::getDoubleTy(getGlobalContext());
+		Type* doubleType = builder.getDoubleTy();
 		return ConstantFP::get(doubleType, value);
 	}
 
-	ConstantFormulaItem(double value, Variables& vars) : FormulaItem(vars), value(value)
+	ConstantParserNode(double value, ParserVariables& vars) : ParserNode(vars), value(value)
 	{
 
 	}
 
-	static ConstantFormulaItem parse(string str, Variables& vars)
+	static ConstantParserNode parse(string str, ParserVariables& vars)
 	{
 		double res = atof(str.c_str());
-		return ConstantFormulaItem(res, vars);
+		return ConstantParserNode(res, vars);
 	}
 	
 	static bool isParseable(string str)
@@ -169,30 +103,30 @@ public:
 	}
 };
 
-class VariableFormulaItem : public FormulaItem
+class RValueParserNode : public ParserNode
 {
 private:
 	string name;
 public:
 	virtual Value* generateLLVMCode(IRBuilder<>& builder)
 	{
-		return builder.CreateLoad(getVariables().get(name), name);
+		return getVariables().generateLLVMVariableGetValueCode(name, builder);
 	}
 
-	VariableFormulaItem(string name, Variables& vars) : FormulaItem(vars), name(name)
+	RValueParserNode(string name, ParserVariables& vars) : ParserNode(vars), name(name)
 	{
 
 	}
 };
 
-class FormulaUnaryOperation : public FormulaItem
+class UnaryOperationParserNode : public ParserNode
 {
 private:
-	FormulaItem *operand;
-	FormulaOperator formulaOperator;
+	ParserNode *operand;
+	ParserOperator formulaOperator;
 public:
-	FormulaUnaryOperation(FormulaItem *operand, FormulaOperator formulaOperator, Variables& vars) :
-		FormulaItem(vars),
+	UnaryOperationParserNode(ParserNode *operand, ParserOperator formulaOperator, ParserVariables& vars) :
+		ParserNode(vars),
 		operand(operand), formulaOperator(formulaOperator)
 	{
 
@@ -218,11 +152,11 @@ public:
 
 };
 
-class FormulaBinaryOperation : public FormulaItem
+class BinaryOperationParserNode : public ParserNode
 {
 private:
-	FormulaItem *first, *second;
-	FormulaOperator oper;
+	ParserNode *first, *second;
+	ParserOperator oper;
 public:
 	virtual Value* generateLLVMCode(IRBuilder<>& builder)
 	{
@@ -249,27 +183,24 @@ public:
 		}
 	}
 
-	FormulaBinaryOperation(FormulaItem* first, FormulaOperator oper, FormulaItem* second, Variables& vars) :
-		FormulaItem(vars), first(first), second(second), oper(oper)
+	BinaryOperationParserNode(ParserNode* first, ParserOperator oper, ParserNode* second, ParserVariables& vars) :
+		ParserNode(vars), first(first), second(second), oper(oper)
 	{
 
 	}
 };
 
-class FormulaParser
+class ExpressionParser
 {
 private:
-	FormulaItem* root;
+	const ParserOperatorPriorities& priorities;
 
-	static FormulaItem* parse(const LexerTreeItem& source, const OperatorPriorities& priorities, Variables& vars);
 public:
-	FormulaParser(const LexerTreeItem& lti, const OperatorPriorities& oprior, Variables& vars);
-	virtual ~FormulaParser();
+	ExpressionParser(const ParserOperatorPriorities& priorities);
 
-	FormulaItem* getRoot()
-	{
-		return root;
-	}
+	ParserNode* parse(const LexerTreeItem& source, ParserVariables& vars);
+
+	virtual ~ExpressionParser();
 };
 
 #endif /* FORMULAPARSER_H_ */

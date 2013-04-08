@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?fileVersion 4.0.0?>
-
-<cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+<?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
 	<storageModule moduleId="org.eclipse.cdt.core.settings">
 		<cconfiguration id="cdt.managedbuild.toolchain.gnu.macosx.base.96868457">
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.toolchain.gnu.macosx.base.96868457" moduleId="org.eclipse.cdt.core.settings" name="OSX">
@@ -10,6 +8,7 @@
 				</externalSettings>
 				<extensions>
 					<extension id="org.eclipse.cdt.core.MachO64" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
@@ -21,7 +20,7 @@
 				<configuration artifactName="${ProjName}" buildProperties="" description="" id="cdt.managedbuild.toolchain.gnu.macosx.base.96868457" name="OSX" parent="org.eclipse.cdt.build.core.emptycfg">
 					<folderInfo id="cdt.managedbuild.toolchain.gnu.macosx.base.96868457.910965586" name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.macosx.base.1672510714" name="cdt.managedbuild.toolchain.gnu.macosx.base" superClass="cdt.managedbuild.toolchain.gnu.macosx.base">
-							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.MachO64" id="cdt.managedbuild.target.gnu.platform.macosx.base.2068371545" name="Debug Platform" osList="macosx" superClass="cdt.managedbuild.target.gnu.platform.macosx.base"/>
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.PE;org.eclipse.cdt.core.MachO64" id="cdt.managedbuild.target.gnu.platform.macosx.base.2068371545" name="Debug Platform" osList="macosx" superClass="cdt.managedbuild.target.gnu.platform.macosx.base"/>
 							<builder buildPath="${workspace_loc:/ideal/OSX}" id="cdt.managedbuild.target.gnu.builder.macosx.base.1648703396" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" superClass="cdt.managedbuild.target.gnu.builder.macosx.base"/>
 							<tool id="cdt.managedbuild.tool.macosx.c.linker.macosx.base.1918494014" name="MacOS X C Linker" superClass="cdt.managedbuild.tool.macosx.c.linker.macosx.base"/>
 							<tool id="cdt.managedbuild.tool.macosx.cpp.linker.macosx.base.1324859551" name="MacOS X C++ Linker" superClass="cdt.managedbuild.tool.macosx.cpp.linker.macosx.base">
@@ -49,7 +48,7 @@
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="LLVMSupport"/>
 								</option>
 								<option id="macosx.cpp.link.option.paths.1876778057" name="Library search path (-L)" superClass="macosx.cpp.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="../lib"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ideal/llvm-3.2/lib}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.macosx.cpp.linker.input.617622764" superClass="cdt.managedbuild.tool.macosx.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
@@ -58,21 +57,21 @@
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.assembler.macosx.base.313489747" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.macosx.base">
 								<option id="gnu.both.asm.option.include.paths.136883235" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="../include"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ideal/llvm-3.2/include}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.282197044" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.archiver.macosx.base.1381505332" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.macosx.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.macosx.base.1339499757" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.macosx.base">
 								<option id="gnu.cpp.compiler.option.include.paths.1779072687" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="../include"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/llvm-3.2/include}&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.335733313" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__STDC_CONSTANT_MACROS"/>
 									<listOptionValue builtIn="false" value="__STDC_LIMIT_MACROS"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.other.other.1009226913" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0" valueType="string"/>
-								<option id="gnu.cpp.compiler.option.optimization.level.807902654" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.optimization.level.807902654" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.343027739" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.compiler.macosx.base.680786278" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.macosx.base">
@@ -80,6 +79,95 @@
 									<listOptionValue builtIn="false" value="../include"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.2128797173" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+					<sourceEntries>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
+					</sourceEntries>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+		<cconfiguration id="cdt.managedbuild.toolchain.gnu.macosx.base.96868457.1236243964">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.toolchain.gnu.macosx.base.96868457.1236243964" moduleId="org.eclipse.cdt.core.settings" name="MinGW32">
+				<externalSettings>
+					<externalSetting/>
+				</externalSettings>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.MachO64" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" description="" id="cdt.managedbuild.toolchain.gnu.macosx.base.96868457.1236243964" name="MinGW32" parent="org.eclipse.cdt.build.core.emptycfg">
+					<folderInfo id="cdt.managedbuild.toolchain.gnu.macosx.base.96868457.1236243964." name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.mingw.base.1884154414" name="MinGW GCC" superClass="cdt.managedbuild.toolchain.gnu.mingw.base">
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.PE;org.eclipse.cdt.core.MachO64" id="cdt.managedbuild.target.gnu.platform.mingw.base.33565034" name="Debug Platform" osList="win32" superClass="cdt.managedbuild.target.gnu.platform.mingw.base"/>
+							<builder buildPath="${workspace_loc:/ideal}/MinGW32" id="cdt.managedbuild.tool.gnu.builder.mingw.base.115339578" keepEnvironmentInBuildfile="false" name="CDT Internal Builder" superClass="cdt.managedbuild.tool.gnu.builder.mingw.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.mingw.base.1724075386" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.mingw.base">
+								<option id="gnu.both.asm.option.include.paths.800463535" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ideal/llvm-3.2/include}&quot;"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.296745407" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.archiver.mingw.base.875077881" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.mingw.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base.548965065" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base">
+								<option id="gnu.cpp.compiler.option.include.paths.89827861" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/llvm-3.2/include}&quot;"/>
+								</option>
+								<option id="gnu.cpp.compiler.option.preprocessor.def.1064595498" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="__STDC_CONSTANT_MACROS"/>
+									<listOptionValue builtIn="false" value="__STDC_LIMIT_MACROS"/>
+								</option>
+								<option id="gnu.cpp.compiler.option.optimization.level.776375288" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1951395011" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.mingw.base.23777385" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.mingw.base">
+								<option id="gnu.c.compiler.option.include.paths.1283525066" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/llvm-3.2/include}&quot;"/>
+								</option>
+								<option id="gnu.c.compiler.option.optimization.level.436954616" superClass="gnu.c.compiler.option.optimization.level" value="gnu.c.optimization.level.none" valueType="enumerated"/>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1783205366" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.mingw.base.1527340720" name="MinGW C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.mingw.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.mingw.base.153196402" name="MinGW C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.mingw.base">
+								<option id="gnu.cpp.link.option.libs.1423574329" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="LLVMX86CodeGen"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="LLVMSelectionDAG"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="LLVMInterpreter"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="LLVMX86Desc"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="LLVMX86AsmPrinter"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="LLVMX86Utils"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="LLVMX86Info"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="LLVMJIT"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="LLVMRuntimeDyld"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="LLVMExecutionEngine"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="LLVMCodeGen"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="LLVMScalarOpts"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="LLVMInstCombine"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="LLVMTransformUtils"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="LLVMipa"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="LLVMAnalysis"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="LLVMTarget"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="LLVMMC"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="LLVMObject"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="LLVMCore"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="LLVMSupport"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="imagehlp"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="psapi"/>
+								</option>
+								<option id="gnu.cpp.link.option.paths.1422554641" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ideal/llvm-3.2/lib}&quot;"/>
+								</option>
+								<option id="gnu.cpp.link.option.flags.2011010460" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="-static-libgcc -static-libstdc++" valueType="string"/>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1460439267" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
 							</tool>
 						</toolChain>
 					</folderInfo>
@@ -102,15 +190,30 @@
 		<configuration configurationName="OSX">
 			<resource resourceType="PROJECT" workspacePath="/ideal"/>
 		</configuration>
+		<configuration configurationName="MinGW32">
+			<resource resourceType="PROJECT" workspacePath="/ideal"/>
+		</configuration>
 	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.macosx.base.96868457.1236243964;cdt.managedbuild.toolchain.gnu.macosx.base.96868457.1236243964.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.23777385;cdt.managedbuild.tool.gnu.c.compiler.input.1783205366">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC"/>
+		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.macosx.base.96868457;cdt.managedbuild.toolchain.gnu.macosx.base.96868457.910965586;cdt.managedbuild.tool.gnu.c.compiler.macosx.base.680786278;cdt.managedbuild.tool.gnu.c.compiler.input.2128797173">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.macosx.base.96868457.1236243964;cdt.managedbuild.toolchain.gnu.macosx.base.96868457.1236243964.;cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base.548965065;cdt.managedbuild.tool.gnu.cpp.compiler.input.1951395011">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP"/>
 		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.macosx.base.96868457;cdt.managedbuild.toolchain.gnu.macosx.base.96868457.910965586;cdt.managedbuild.tool.gnu.cpp.compiler.macosx.base.1339499757;cdt.managedbuild.tool.gnu.cpp.compiler.input.343027739">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.macosx.base.96868457.1236243964;cdt.managedbuild.toolchain.gnu.macosx.base.96868457.1236243964.;cdt.managedbuild.tool.gnu.cpp.compiler.macosx.base.1346300071;cdt.managedbuild.tool.gnu.cpp.compiler.input.629150518">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.macosx.base.96868457.1236243964;cdt.managedbuild.toolchain.gnu.macosx.base.96868457.1236243964.;cdt.managedbuild.tool.gnu.c.compiler.macosx.base.676622325;cdt.managedbuild.tool.gnu.c.compiler.input.1000797647">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
 	</storageModule>
-	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 </cproject>
