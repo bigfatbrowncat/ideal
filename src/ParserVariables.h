@@ -68,11 +68,16 @@ public:
 	}
 
 
-	StoreInst* generateLLVMVariableSetValueCode(const string& name, double value, IRBuilder<>& builder)
+	StoreInst* generateLLVMVariableSetToConstantCode(const string& name, double value, IRBuilder<>& builder)
 	{
 		Type* doubleType = builder.getDoubleTy();
 		Value* xValue = ConstantFP::get(doubleType, value);
 		return builder.CreateStore(xValue, getLLVMVariableIdentifier(name));
+	}
+
+	StoreInst* generateLLVMVariableSetValueCode(const string& name, Value* value, IRBuilder<>& builder)
+	{
+		return builder.CreateStore(value, getLLVMVariableIdentifier(name));
 	}
 
 	LoadInst* generateLLVMVariableGetValueCode(const string& name, IRBuilder<>& builder)

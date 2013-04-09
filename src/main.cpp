@@ -53,10 +53,12 @@ int main(int argc, char** argv)
   	catch (const LexerException& lexerException)
   	{
   		printf("Lexer is asking for excuse. %s", lexerException.getMessage().c_str());
+  		return -1;
   	}
   	catch (const ParserException& parserException)
   	{
   		printf("Parser is asking for excuse. %s", parserException.getMessage().c_str());
+  		return -1;
   	}
 
 	// ** Generating the code **
@@ -75,10 +77,10 @@ int main(int argc, char** argv)
 	IRBuilder<> builder(mainFunctionEntryBlock);
 
 	vars.generateVariableCreationLLVMCode("x", builder);
-	vars.generateLLVMVariableSetValueCode("x", 12.3, builder);
+	vars.generateLLVMVariableSetToConstantCode("x", 12.3, builder);
 
 	// Generating our formula
-	Value* formulaVal = formulaRoot->generateLLVMCode(builder);
+	Value* formulaVal = formulaRoot->generateGetValueLLVMCode(builder);
 
 	// Returning our formula result
 	builder.CreateRet(formulaVal);

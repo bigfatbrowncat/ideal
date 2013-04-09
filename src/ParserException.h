@@ -72,4 +72,13 @@ public:
 	}
 };
 
+class NotAssignableParserException : ParserException
+{
+public:
+	NotAssignableParserException() :
+		ParserException(string("Trying to assign value to something not assignable"))
+	{
+	}
+};
+
 #endif /* PARSINGEXCEPTION_H_ */

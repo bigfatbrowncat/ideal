@@ -24,8 +24,9 @@ using namespace llvm;
 
 enum ParserOperator
 {
-	foUnaryMinus,
-	foAdd, foSubtract, foMultiply, foDivide
+	foNegate,
+	foAdd, foSubtract, foMultiply, foDivide,
+	foEquate
 };
 
 class ParserOperatorPriorities
@@ -35,11 +36,12 @@ private:
 public:
 	ParserOperatorPriorities()
 	{
-		priorities.insert(pair<ParserOperator, int>(foUnaryMinus, 3));
-		priorities.insert(pair<ParserOperator, int>(foMultiply, 2));
-		priorities.insert(pair<ParserOperator, int>(foDivide, 2));
-		priorities.insert(pair<ParserOperator, int>(foAdd, 1));
-		priorities.insert(pair<ParserOperator, int>(foSubtract, 1));
+		priorities.insert(pair<ParserOperator, int>(foNegate, 4));
+		priorities.insert(pair<ParserOperator, int>(foMultiply, 3));
+		priorities.insert(pair<ParserOperator, int>(foDivide, 3));
+		priorities.insert(pair<ParserOperator, int>(foAdd, 2));
+		priorities.insert(pair<ParserOperator, int>(foSubtract, 2));
+		priorities.insert(pair<ParserOperator, int>(foEquate, 1));
 	}
 
 	int priorityOf(ParserOperator oper) const
@@ -53,10 +55,20 @@ class ConstantParserNode : public ParserNode
 private:
 	double value;
 public:
-	virtual Value* generateLLVMCode(IRBuilder<>& builder)
+	bool canBeAssigned()
+	{
+		return false;
+	}
+
+	virtual Value* generateGetValueLLVMCode(IRBuilder<>& builder)
 	{
 		Type* doubleType = builder.getDoubleTy();
 		return ConstantFP::get(doubleType, value);
+	}
+
+	virtual Value* generateSetValueLLVMCode(Value* value, IRBuilder<>& builder)
+	{
+		return NULL;
 	}
 
 	ConstantParserNode(double value, ParserVariables& vars) : ParserNode(vars), value(value)
@@ -102,17 +114,27 @@ public:
 	}
 };
 
-class RValueParserNode : public ParserNode
+class VariableParserNode : public ParserNode
 {
 private:
 	string name;
 public:
-	virtual Value* generateLLVMCode(IRBuilder<>& builder)
+	bool canBeAssigned()
+	{
+		return true;
+	}
+
+	virtual Value* generateGetValueLLVMCode(IRBuilder<>& builder)
 	{
 		return getVariables().generateLLVMVariableGetValueCode(name, builder);
 	}
 
-	RValueParserNode(string name, ParserVariables& vars) : ParserNode(vars), name(name)
+	virtual Value* generateSetValueLLVMCode(Value* value, IRBuilder<>& builder)
+	{
+		return getVariables().generateLLVMVariableSetValueCode(name, value, builder);
+	}
+
+	VariableParserNode(string name, ParserVariables& vars) : ParserNode(vars), name(name)
 	{
 
 	}
@@ -124,6 +146,11 @@ private:
 	ParserNode *operand;
 	ParserOperator formulaOperator;
 public:
+	bool canBeAssigned()
+	{
+		return false;
+	}
+
 	UnaryOperationParserNode(ParserNode *operand, ParserOperator formulaOperator, ParserVariables& vars) :
 		ParserNode(vars),
 		operand(operand), formulaOperator(formulaOperator)
@@ -131,9 +158,9 @@ public:
 
 	}
 
-	virtual Value* generateLLVMCode(IRBuilder<>& builder)
+	virtual Value* generateGetValueLLVMCode(IRBuilder<>& builder)
 	{
-		Value* operandVal = operand->generateLLVMCode(builder);
+		Value* operandVal = operand->generateGetValueLLVMCode(builder);
 
 		if (operandVal == NULL)
 		{
@@ -142,12 +169,19 @@ public:
 
 		switch (formulaOperator)
 		{
-		case foUnaryMinus:
+		case foNegate:
 			return builder.CreateFNeg(operandVal, "neg");
 		default:
 			return NULL;
 		}
 	}
+
+	virtual Value* generateSetValueLLVMCode(Value* value, IRBuilder<>& builder)
+	{
+		return NULL;
+	}
+
+
 
 };
 
@@ -157,10 +191,24 @@ private:
 	ParserNode *first, *second;
 	ParserOperator oper;
 public:
-	virtual Value* generateLLVMCode(IRBuilder<>& builder)
+	bool canBeAssigned()
 	{
-		Value* firstVal = first->generateLLVMCode(builder);
-		Value* secondVal = second->generateLLVMCode(builder);
+		return false;
+	}
+
+	virtual Value* generateSetValueLLVMCode(Value* value, IRBuilder<>& builder)
+	{
+		return NULL;
+	}
+
+	virtual Value* generateGetValueLLVMCode(IRBuilder<>& builder)
+	{
+		Value* firstVal;
+		if (oper != foEquate) // If firstVal isn't an l-value
+		{
+			firstVal = first->generateGetValueLLVMCode(builder);
+		}
+		Value* secondVal = second->generateGetValueLLVMCode(builder);
 
 		if (firstVal == NULL || secondVal == NULL)
 		{
@@ -177,6 +225,20 @@ public:
 			return builder.CreateFMul(firstVal, secondVal, "mulop");
 		case foDivide:
 			return builder.CreateFDiv(firstVal, secondVal, "divop");
+		case foEquate:
+		{
+			if (first->canBeAssigned())
+			{
+				first->generateSetValueLLVMCode(secondVal, builder);
+				return first->generateGetValueLLVMCode(builder);
+			}
+			else
+			{
+				// TODO throw a proper exception
+				return NULL;
+			}
+		}
+
 		default:
 			return NULL;
 		}

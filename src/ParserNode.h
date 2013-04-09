@@ -26,7 +26,9 @@ protected:
 	ParserNode(ParserVariables& vars) : vars(vars) {}
 	virtual ~ParserNode() {}
 public:
-	virtual Value* generateLLVMCode(IRBuilder<>& builder) = 0;
+	virtual bool canBeAssigned() = 0;
+	virtual Value* generateGetValueLLVMCode(IRBuilder<>& builder) = 0;
+	virtual Value* generateSetValueLLVMCode(Value* value, IRBuilder<>& builder) = 0;
 	ParserVariables& getVariables() { return vars; }
 };
 

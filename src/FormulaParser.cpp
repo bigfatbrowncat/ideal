@@ -52,7 +52,7 @@ ParserNode* ExpressionParser::parse(const LexerTreeItem& source, ParserVariables
 			}
 			else
 			{
-				items.push_back(ParserItemWrapper::withOperator(foUnaryMinus));
+				items.push_back(ParserItemWrapper::withOperator(foNegate));
 			}
 			previousIsOperand = false;
 		}
@@ -64,6 +64,11 @@ ParserNode* ExpressionParser::parse(const LexerTreeItem& source, ParserVariables
 		else if ((*iter).getInnerText() == "/")
 		{
 			items.push_back(ParserItemWrapper::withOperator(foDivide));
+			previousIsOperand = false;
+		}
+		else if ((*iter).getInnerText() == "=")
+		{
+			items.push_back(ParserItemWrapper::withOperator(foEquate));
 			previousIsOperand = false;
 		}
 		else if ((*iter).getOuterBraces() == brRound)
@@ -79,7 +84,7 @@ ParserNode* ExpressionParser::parse(const LexerTreeItem& source, ParserVariables
 		}
 		else if (vars.contains((*iter).getInnerText()))
 		{
-			RValueParserNode* vfi = new RValueParserNode((*iter).getInnerText(), vars);
+			VariableParserNode* vfi = new VariableParserNode((*iter).getInnerText(), vars);
 			items.push_back(ParserItemWrapper::withOperand(vfi));
 			previousIsOperand = true;
 		}
@@ -108,7 +113,7 @@ ParserNode* ExpressionParser::parse(const LexerTreeItem& source, ParserVariables
 			}
 		}
 
-		if (items[highest_priority_index].parserOperator == foUnaryMinus)
+		if (items[highest_priority_index].parserOperator == foNegate)
 		{
 			// Unary operators
 
@@ -134,6 +139,14 @@ ParserNode* ExpressionParser::parse(const LexerTreeItem& source, ParserVariables
 			if (highest_priority_index > items.size() - 2 || items[highest_priority_index + 1].type != ParserItemWrapper::tOperand)
 			{
 				throw OperandWantedParserException();
+			}
+
+			if (items[highest_priority_index].parserOperator == foEquate)
+			{
+				if (!items[highest_priority_index - 1].parserOperand->canBeAssigned())
+				{
+					throw NotAssignableParserException();
+				}
 			}
 
 			// Replacing the binary operation part with a single object

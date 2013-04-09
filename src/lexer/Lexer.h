@@ -39,7 +39,7 @@ private:
 
 	bool isOperator(char ch)
 	{
-		return (ch == '+') || (ch == '-') || (ch == '*') || (ch == '/') || (ch == '^');
+		return (ch == '+') || (ch == '-') || (ch == '*') || (ch == '/') || (ch == '^') || (ch == '=');
 	}
 
 	bool isWhitespace(char ch)
