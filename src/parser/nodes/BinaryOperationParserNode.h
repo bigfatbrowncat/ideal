@@ -17,17 +17,17 @@ private:
 	ParserNode *first, *second;
 	ParserOperator oper;
 public:
-	bool canBeAssigned()
+	bool canBeAssigned() const
 	{
 		return false;
 	}
 
-	virtual Value* generateSetValueLLVMCode(Value* value, IRBuilder<>& builder)
+	virtual Value* generateSetValueLLVMCode(Value* value, IRBuilder<>& builder) const
 	{
 		return NULL;
 	}
 
-	virtual Value* generateGetValueLLVMCode(IRBuilder<>& builder)
+	virtual Value* generateGetValueLLVMCode(IRBuilder<>& builder) const
 	{
 		Value* firstVal = first->generateGetValueLLVMCode(builder);
 		Value* secondVal = second->generateGetValueLLVMCode(builder);
