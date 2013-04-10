@@ -11,10 +11,10 @@
 #include "llvm/Support/ManagedStatic.h"
 #include "llvm/Support/raw_ostream.h"
 
-#include "FormulaParser.h"
-
 #include "lexer/LexerException.h"
-#include "ParserException.h"
+
+#include "parser/ExpressionParser.h"
+#include "parser/ParserException.h"
 
 #include <stdio.h>
 #include <string>
@@ -100,6 +100,7 @@ int main(int argc, char** argv)
 	// Import result of execution:
 	outs() << "Result: " << gv.DoubleVal << "\n";
 	executionEngine->freeMachineCodeForFunction(mainFunction);
+
 	delete executionEngine;
 	llvm_shutdown();
 	return 0;

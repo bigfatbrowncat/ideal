@@ -5,7 +5,13 @@
  *      Author: il
  */
 
-#include "FormulaParser.h"
+#include "ExpressionParser.h"
+
+#include "nodes/AssignmentOperationParserNode.h"
+#include "nodes/BinaryOperationParserNode.h"
+#include "nodes/UnaryOperationParserNode.h"
+#include "nodes/ConstantParserNode.h"
+#include "nodes/VariableParserNode.h"
 
 struct ParserItemWrapper
 {
@@ -36,6 +42,7 @@ ParserNode* ExpressionParser::parse(const LexerTreeItem& source, ParserVariables
 {
 	vector<ParserItemWrapper> items;
 
+	// Wrapping lexer primitives into parser ParserItemWrapper objects
 	bool previousIsOperand = false;
 	for (list<LexerTreeItem>::const_iterator iter = source.getInnerItems().begin(); iter != source.getInnerItems().end(); iter++)
 	{
@@ -76,7 +83,7 @@ ParserNode* ExpressionParser::parse(const LexerTreeItem& source, ParserVariables
 			items.push_back(ParserItemWrapper::withOperand(parse(*iter, vars)));
 			previousIsOperand = true;
 		}
-		else if (ConstantParserNode::isParseable((*iter).getInnerText()))
+		else if (ConstantParserNode::isParsable((*iter).getInnerText()))
 		{
 			ConstantParserNode* cfi = new ConstantParserNode(ConstantParserNode::parse((*iter).getInnerText(), vars));
 			items.push_back(ParserItemWrapper::withOperand(cfi));
@@ -94,7 +101,7 @@ ParserNode* ExpressionParser::parse(const LexerTreeItem& source, ParserVariables
 		}
 	}
 
-
+	// Processing operators
 	while (items.size() > 1)
 	{
 		size_t highest_priority_index = 0;
@@ -113,7 +120,31 @@ ParserNode* ExpressionParser::parse(const LexerTreeItem& source, ParserVariables
 			}
 		}
 
-		if (items[highest_priority_index].parserOperator == foNegate)
+		if (items[highest_priority_index].parserOperator == foEquate)
+		{
+			// Assign operator
+
+			if (highest_priority_index < 1 || items[highest_priority_index - 1].type != ParserItemWrapper::tOperand)
+			{
+				throw OperandWantedParserException();
+			}
+			if (highest_priority_index > items.size() - 2 || items[highest_priority_index + 1].type != ParserItemWrapper::tOperand)
+			{
+				throw OperandWantedParserException();
+			}
+			if (!items[highest_priority_index - 1].parserOperand->canBeAssigned())
+			{
+				throw NotAssignableParserException();
+			}
+
+			AssignmentOperationParserNode* fao = new AssignmentOperationParserNode(items[highest_priority_index - 1].parserOperand,
+			                                                               items[highest_priority_index + 1].parserOperand,
+			                                                               vars);
+			items.erase(items.begin() + highest_priority_index + 1);
+			items.erase(items.begin() + highest_priority_index);
+			items[highest_priority_index - 1] = ParserItemWrapper::withOperand(fao);
+		}
+		else if (items[highest_priority_index].parserOperator == foNegate)
 		{
 			// Unary operators
 
