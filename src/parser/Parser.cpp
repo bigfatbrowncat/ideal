@@ -39,20 +39,20 @@ struct ParserItemWrapper
 	}
 };
 
-ParserNode* Parser::parseExpression(const list<LexerTreeItem>& source, ParserVariables& vars)
+ParserNode* Parser::parseExpression(const list<LexerTreeItem*>& source, ParserVariables& vars)
 {
 	vector<ParserItemWrapper> items;
 
 	// Wrapping lexer primitives into parser ParserItemWrapper objects
 	bool previousIsOperand = false;
-	for (list<LexerTreeItem>::const_iterator iter = source.begin(); iter != source.end(); iter++)
+	for (list<LexerTreeItem*>::const_iterator iter = source.begin(); iter != source.end(); iter++)
 	{
-		if ((*iter).getInnerText() == "+")
+		if ((*iter)->getInnerText() == "+")
 		{
 			items.push_back(ParserItemWrapper::withOperator(foAdd));
 			previousIsOperand = false;
 		}
-		else if ((*iter).getInnerText() == "-")
+		else if ((*iter)->getInnerText() == "-")
 		{
 			if (previousIsOperand)
 			{
@@ -64,46 +64,46 @@ ParserNode* Parser::parseExpression(const list<LexerTreeItem>& source, ParserVar
 			}
 			previousIsOperand = false;
 		}
-		else if ((*iter).getInnerText() == "*")
+		else if ((*iter)->getInnerText() == "*")
 		{
 			items.push_back(ParserItemWrapper::withOperator(foMultiply));
 			previousIsOperand = false;
 		}
-		else if ((*iter).getInnerText() == "/")
+		else if ((*iter)->getInnerText() == "/")
 		{
 			items.push_back(ParserItemWrapper::withOperator(foDivide));
 			previousIsOperand = false;
 		}
-		else if ((*iter).getInnerText() == "=")
+		else if ((*iter)->getInnerText() == "=")
 		{
 			items.push_back(ParserItemWrapper::withOperator(foEquate));
 			previousIsOperand = false;
 		}
-		else if ((*iter).getOuterBraces() == brRound)
+		else if ((*iter)->getOuterBraces() == brRound)
 		{
-			items.push_back(ParserItemWrapper::withOperand(parseExpression((*iter).getInnerItems(), vars)));
+			items.push_back(ParserItemWrapper::withOperand(parseExpression((*iter)->getInnerItems(), vars)));
 			previousIsOperand = true;
 		}
-		else if ((*iter).getOuterBraces() == brCurly)
+		else if ((*iter)->getOuterBraces() == brCurly)
 		{
-			items.push_back(ParserItemWrapper::withOperand(parseFlow((*iter).getInnerItems(), vars)));
+			items.push_back(ParserItemWrapper::withOperand(parseFlow((*iter)->getInnerItems(), vars)));
 			previousIsOperand = true;
 		}
-		else if (ConstantParserNode::isParsable((*iter).getInnerText()))
+		else if (ConstantParserNode::isParsable((*iter)->getInnerText()))
 		{
-			ConstantParserNode* cfi = new ConstantParserNode(ConstantParserNode::parse((*iter).getInnerText(), vars));
+			ConstantParserNode* cfi = new ConstantParserNode(ConstantParserNode::parse((*iter)->getInnerText(), vars));
 			items.push_back(ParserItemWrapper::withOperand(cfi));
 			previousIsOperand = true;
 		}
-		else if (vars.contains((*iter).getInnerText()))
+		else if (vars.contains((*iter)->getInnerText()))
 		{
-			VariableParserNode* vfi = new VariableParserNode((*iter).getInnerText(), vars);
+			VariableParserNode* vfi = new VariableParserNode((*iter)->getInnerText(), vars);
 			items.push_back(ParserItemWrapper::withOperand(vfi));
 			previousIsOperand = true;
 		}
 		else
 		{
-			throw InvalidTokenParserException((*iter).getInnerText());
+			throw InvalidTokenParserException((*iter)->getInnerText());
 		}
 	}
 
@@ -205,14 +205,14 @@ ParserNode* Parser::parseExpression(const list<LexerTreeItem>& source, ParserVar
 	return items.front().parserOperand;
 }
 
-ParserNode* Parser::parseFlow(const list<LexerTreeItem>& source, ParserVariables& vars)
+ParserNode* Parser::parseFlow(const list<LexerTreeItem*>& source, ParserVariables& vars)
 {
 	ExecutionFlowParserNode* res = new ExecutionFlowParserNode(vars);
-	list<LexerTreeItem> currentExpression;
+	list<LexerTreeItem*> currentExpression;
 
-	for (list<LexerTreeItem>::const_iterator iter = source.begin(); iter != source.end(); iter++)
+	for (list<LexerTreeItem*>::const_iterator iter = source.begin(); iter != source.end(); iter++)
 	{
-		if ((*iter).getInnerText() == ";")
+		if ((*iter)->getInnerText() == ";")
 		{
 			res->addParserNode(parseExpression(currentExpression, vars));
 			currentExpression.clear();

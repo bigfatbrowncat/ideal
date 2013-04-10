@@ -97,9 +97,9 @@ void LexerTreeItem::doLexing(list<LexerTreeItem*>& nextIteration)
 			if (braces.thereAreOpened())
 			{
 				// Braces opened. Saving current item
-				LexerTreeItem li(curItemText);
+				LexerTreeItem* li = new LexerTreeItem(curItemText);
 				innerItems.push_back(li);
-				nextIteration.push_back(&(innerItems.back()));
+				nextIteration.push_back(innerItems.back());
 
 				curState = inbraces;
 				// Adding first brace char to next item
@@ -113,9 +113,9 @@ void LexerTreeItem::doLexing(list<LexerTreeItem*>& nextIteration)
 			else if (isOperator(innerText[i]))
 			{
 				// Changed to operator. Saving current item
-				LexerTreeItem li(curItemText);
+				LexerTreeItem* li = new LexerTreeItem(curItemText);
 				innerItems.push_back(li);
-				nextIteration.push_back(&(innerItems.back()));
+				nextIteration.push_back(innerItems.back());
 
 				curState = oper;
 				// Adding first operator char to next item
@@ -124,9 +124,9 @@ void LexerTreeItem::doLexing(list<LexerTreeItem*>& nextIteration)
 			else if (isWhitespace(innerText[i]))
 			{
 				// Identifier ended. Saving it
-				LexerTreeItem li(curItemText);
+				LexerTreeItem* li = new LexerTreeItem(curItemText);
 				innerItems.push_back(li);
-				nextIteration.push_back(&(innerItems.back()));
+				nextIteration.push_back(innerItems.back());
 
 				curState = whitespace;
 				// Clearing current item text
@@ -140,9 +140,9 @@ void LexerTreeItem::doLexing(list<LexerTreeItem*>& nextIteration)
 			if (braces.thereAreOpened())
 			{
 				// Braces opened. Saving current item
-				LexerTreeItem li(curItemText);
+				LexerTreeItem* li = new LexerTreeItem(curItemText);
 				innerItems.push_back(li);
-				nextIteration.push_back(&(innerItems.back()));
+				nextIteration.push_back(innerItems.back());
 
 				curState = inbraces;
 				// Adding first brace char to next item
@@ -164,9 +164,9 @@ void LexerTreeItem::doLexing(list<LexerTreeItem*>& nextIteration)
 				{
 					// The new symbol is still operator, but an another one
 					// Saving current item
-					LexerTreeItem li(curItemText);
+					LexerTreeItem* li = new LexerTreeItem(curItemText);
 					innerItems.push_back(li);
-					nextIteration.push_back(&(innerItems.back()));
+					nextIteration.push_back(innerItems.back());
 
 					// Adding first operator char to next item
 					curItemText = innerText[i];
@@ -175,9 +175,9 @@ void LexerTreeItem::doLexing(list<LexerTreeItem*>& nextIteration)
 			else if (isLetter(innerText[i]) || innerText[i] == '_')
 			{
 				// Changed to identifier. Saving current item
-				LexerTreeItem li(curItemText);
+				LexerTreeItem* li = new LexerTreeItem(curItemText);
 				innerItems.push_back(li);
-				nextIteration.push_back(&(innerItems.back()));
+				nextIteration.push_back(innerItems.back());
 
 				curState = ident;
 				// Adding first operator char to next item
@@ -186,9 +186,9 @@ void LexerTreeItem::doLexing(list<LexerTreeItem*>& nextIteration)
 			else if (isDigit(innerText[i]))
 			{
 				// Changed to number. Saving current item
-				LexerTreeItem li(curItemText);
+				LexerTreeItem* li = new LexerTreeItem(curItemText);
 				innerItems.push_back(li);
-				nextIteration.push_back(&(innerItems.back()));
+				nextIteration.push_back(innerItems.back());
 
 				curState = number;
 				// Adding first operator char to next item
@@ -197,9 +197,9 @@ void LexerTreeItem::doLexing(list<LexerTreeItem*>& nextIteration)
 			else if (isWhitespace(innerText[i]))
 			{
 				// Identifier ended. Saving it
-				LexerTreeItem li(curItemText);
+				LexerTreeItem* li = new LexerTreeItem(curItemText);
 				innerItems.push_back(li);
-				nextIteration.push_back(&(innerItems.back()));
+				nextIteration.push_back(innerItems.back());
 
 				curState = whitespace;
 				// Clearing current item text
@@ -213,9 +213,9 @@ void LexerTreeItem::doLexing(list<LexerTreeItem*>& nextIteration)
 			if (braces.thereAreOpened())
 			{
 				// Braces opened. Saving current item
-				LexerTreeItem li(curItemText);
+				LexerTreeItem* li = new LexerTreeItem(curItemText);
 				innerItems.push_back(li);
-				nextIteration.push_back(&(innerItems.back()));
+				nextIteration.push_back(innerItems.back());
 
 				curState = inbraces;
 				// Adding first brace char to next item
@@ -229,9 +229,9 @@ void LexerTreeItem::doLexing(list<LexerTreeItem*>& nextIteration)
 			else if (isOperator(innerText[i]))
 			{
 				// Changed to operator. Saving current item
-				LexerTreeItem li(curItemText);
+				LexerTreeItem* li = new LexerTreeItem(curItemText);
 				innerItems.push_back(li);
-				nextIteration.push_back(&(innerItems.back()));
+				nextIteration.push_back(innerItems.back());
 
 				curState = oper;
 				// Adding first operator char to next item
@@ -240,9 +240,9 @@ void LexerTreeItem::doLexing(list<LexerTreeItem*>& nextIteration)
 			else if (isWhitespace(innerText[i]))
 			{
 				// Number ended. Saving it
-				LexerTreeItem li(curItemText);
+				LexerTreeItem* li = new LexerTreeItem(curItemText);
 				innerItems.push_back(li);
-				nextIteration.push_back(&(innerItems.back()));
+				nextIteration.push_back(innerItems.back());
 
 				curState = whitespace;
 				// Clearing current item text
@@ -258,9 +258,9 @@ void LexerTreeItem::doLexing(list<LexerTreeItem*>& nextIteration)
 			if (!braces.thereAreOpened())
 			{
 				// Braces closed. Saving current item
-				LexerTreeItem li(curItemText);
+				LexerTreeItem* li = new LexerTreeItem(curItemText);
 				innerItems.push_back(li);
-				nextIteration.push_back(&(innerItems.back()));
+				nextIteration.push_back(innerItems.back());
 
 				curState = whitespace;
 				curItemText = "";
@@ -273,18 +273,18 @@ void LexerTreeItem::doLexing(list<LexerTreeItem*>& nextIteration)
 	// Saving the last lexer item
 	if (curItemText != "")
 	{
-		LexerTreeItem li(curItemText);
+		LexerTreeItem* li = new LexerTreeItem(curItemText);
 		innerItems.push_back(li);
-		nextIteration.push_back(&(innerItems.back()));
+		nextIteration.push_back(innerItems.back());
 	}
 
 	// Checking: if we don't have outer braces but we have only one inner item
 	//           and it's without braces too, it is our copy, so we remove it
 	//           from the next iteration.
-	if (outerBraces == brNone && innerItems.size() == 1 && innerItems.back().outerBraces == brNone)
+	if (outerBraces == brNone && innerItems.size() == 1 && innerItems.back()->outerBraces == brNone)
 	{
-		nextIteration.remove(&innerItems.front());
-//		innerItems.clear();
+		nextIteration.remove(innerItems.front());
+
 	}
 
 	if (braces.thereAreOpened())

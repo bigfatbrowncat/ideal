@@ -19,7 +19,7 @@ class LexerTreeItem
 {
 private:
 	string innerText;
-	list<LexerTreeItem> innerItems;
+	list<LexerTreeItem*> innerItems;
 	Brace outerBraces;
 
 	bool isDigit(char ch)
@@ -86,7 +86,7 @@ public:
 	}
 
 	const string& getInnerText() const { return innerText; }
-	const list<LexerTreeItem>& getInnerItems() const { return innerItems; }
+	const list<LexerTreeItem*>& getInnerItems() const { return innerItems; }
 	Brace getOuterBraces() const { return outerBraces; }
 
 	void doLexing(list<LexerTreeItem*>& nextIteration);

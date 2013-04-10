@@ -31,8 +31,8 @@ private:
 public:
 	Parser(const ParserOperatorPriorities& priorities);
 
-	ParserNode* parseExpression(const list<LexerTreeItem>& source, ParserVariables& vars);
-	ParserNode* parseFlow(const list<LexerTreeItem>& source, ParserVariables& vars);
+	ParserNode* parseExpression(const list<LexerTreeItem*>& source, ParserVariables& vars);
+	ParserNode* parseFlow(const list<LexerTreeItem*>& source, ParserVariables& vars);
 
 	virtual ~Parser();
 };
