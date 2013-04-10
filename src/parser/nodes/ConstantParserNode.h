@@ -15,18 +15,18 @@ class ConstantParserNode : public ParserNode
 private:
 	double value;
 public:
-	bool canBeAssigned()
+	bool canBeAssigned() const
 	{
 		return false;
 	}
 
-	virtual Value* generateGetValueLLVMCode(IRBuilder<>& builder)
+	virtual Value* generateGetValueLLVMCode(IRBuilder<>& builder) const
 	{
 		Type* doubleType = builder.getDoubleTy();
 		return ConstantFP::get(doubleType, value);
 	}
 
-	virtual Value* generateSetValueLLVMCode(Value* value, IRBuilder<>& builder)
+	virtual Value* generateSetValueLLVMCode(Value* value, IRBuilder<>& builder) const
 	{
 		return NULL;
 	}

@@ -152,12 +152,17 @@ void LexerTreeItem::doLexing(list<LexerTreeItem*>& nextIteration)
 			{
 				if (curItemText.length() == 0 || curItemText[curItemText.length() - 1] == innerText[i])
 				{
-					// The same operator symbol i.e. +, ++, --, ** etc...
+					// The same operator symbol (i.e. +, ++, --, ** etc...)
+					curItemText += innerText[i];
+				}
+				else if (innerText[i] == '=' && curItemText.length() > 0 && isValidWithEq(curItemText[curItemText.length() - 1]))
+				{
+					// Operator op= (i.e. += -= *= /= etc...)
 					curItemText += innerText[i];
 				}
 				else
 				{
-					// The new symbol is still operator, but another one
+					// The new symbol is still operator, but an another one
 					// Saving current item
 					LexerTreeItem li(curItemText);
 					innerItems.push_back(li);

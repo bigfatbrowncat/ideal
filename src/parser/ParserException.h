@@ -13,7 +13,7 @@
 
 using namespace std;
 
-class ParserException : exception
+class ParserException : public exception
 {
 private:
 	string message;
@@ -27,7 +27,7 @@ public:
 	virtual ~ParserException() throw ();
 };
 
-class UndefinedVariableParserException : ParserException
+class UndefinedVariableParserException : public ParserException
 {
 public:
 	UndefinedVariableParserException(const string& variableName) :
@@ -36,7 +36,7 @@ public:
 	}
 };
 
-class VariableRedifinitionParserException : ParserException
+class VariableRedifinitionParserException : public ParserException
 {
 public:
 	VariableRedifinitionParserException(const string& variableName) :
@@ -45,7 +45,7 @@ public:
 	}
 };
 
-class VariableCreationCodeGeneratedParserException : ParserException
+class VariableCreationCodeGeneratedParserException : public ParserException
 {
 public:
 	VariableCreationCodeGeneratedParserException(const string& variableName) :
@@ -54,7 +54,7 @@ public:
 	}
 };
 
-class OperandWantedParserException : ParserException
+class OperandWantedParserException : public ParserException
 {
 public:
 	OperandWantedParserException() :
@@ -63,7 +63,7 @@ public:
 	}
 };
 
-class InvalidTokenParserException : ParserException
+class InvalidTokenParserException : public ParserException
 {
 public:
 	InvalidTokenParserException(const string& token) :
@@ -72,7 +72,7 @@ public:
 	}
 };
 
-class NotAssignableParserException : ParserException
+class NotAssignableParserException : public ParserException
 {
 public:
 	NotAssignableParserException() :

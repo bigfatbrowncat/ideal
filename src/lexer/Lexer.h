@@ -39,12 +39,18 @@ private:
 
 	bool isOperator(char ch)
 	{
-		return (ch == '+') || (ch == '-') || (ch == '*') || (ch == '/') || (ch == '^') || (ch == '=');
+		return (ch == '+') || (ch == '-') || (ch == '*') || (ch == '/') || (ch == '^') || (ch == '=') || (ch == ';');
 	}
 
 	bool isWhitespace(char ch)
 	{
 		return (ch == ' ') || (ch == '\t') || (ch == '\r') || (ch == '\n');
+	}
+
+	// This function is used for lexing double-char operators such as '+=', '-=', '*=', '/='
+	bool isValidWithEq(char ch)
+	{
+		return (ch == '+') || (ch == '-') || (ch == '*') || (ch == '/');
 	}
 
 	void extractBraces()

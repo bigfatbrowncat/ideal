@@ -5,13 +5,14 @@
  *      Author: il
  */
 
-#include "ExpressionParser.h"
+#include "Parser.h"
 
 #include "nodes/AssignmentOperationParserNode.h"
 #include "nodes/BinaryOperationParserNode.h"
 #include "nodes/UnaryOperationParserNode.h"
 #include "nodes/ConstantParserNode.h"
 #include "nodes/VariableParserNode.h"
+#include "nodes/ExecutionFlowParserNode.h"
 
 struct ParserItemWrapper
 {
@@ -38,13 +39,13 @@ struct ParserItemWrapper
 	}
 };
 
-ParserNode* ExpressionParser::parse(const LexerTreeItem& source, ParserVariables& vars)
+ParserNode* Parser::parseExpression(const list<LexerTreeItem>& source, ParserVariables& vars)
 {
 	vector<ParserItemWrapper> items;
 
 	// Wrapping lexer primitives into parser ParserItemWrapper objects
 	bool previousIsOperand = false;
-	for (list<LexerTreeItem>::const_iterator iter = source.getInnerItems().begin(); iter != source.getInnerItems().end(); iter++)
+	for (list<LexerTreeItem>::const_iterator iter = source.begin(); iter != source.end(); iter++)
 	{
 		if ((*iter).getInnerText() == "+")
 		{
@@ -80,7 +81,12 @@ ParserNode* ExpressionParser::parse(const LexerTreeItem& source, ParserVariables
 		}
 		else if ((*iter).getOuterBraces() == brRound)
 		{
-			items.push_back(ParserItemWrapper::withOperand(parse(*iter, vars)));
+			items.push_back(ParserItemWrapper::withOperand(parseExpression((*iter).getInnerItems(), vars)));
+			previousIsOperand = true;
+		}
+		else if ((*iter).getOuterBraces() == brCurly)
+		{
+			items.push_back(ParserItemWrapper::withOperand(parseFlow((*iter).getInnerItems(), vars)));
 			previousIsOperand = true;
 		}
 		else if (ConstantParserNode::isParsable((*iter).getInnerText()))
@@ -199,11 +205,38 @@ ParserNode* ExpressionParser::parse(const LexerTreeItem& source, ParserVariables
 	return items.front().parserOperand;
 }
 
-ExpressionParser::ExpressionParser(const ParserOperatorPriorities& priorities) : priorities(priorities)
+ParserNode* Parser::parseFlow(const list<LexerTreeItem>& source, ParserVariables& vars)
+{
+	ExecutionFlowParserNode* res = new ExecutionFlowParserNode(vars);
+	list<LexerTreeItem> currentExpression;
+
+	for (list<LexerTreeItem>::const_iterator iter = source.begin(); iter != source.end(); iter++)
+	{
+		if ((*iter).getInnerText() == ";")
+		{
+			res->addParserNode(parseExpression(currentExpression, vars));
+			currentExpression.clear();
+		}
+		else
+		{
+			currentExpression.push_back(*iter);
+		}
+	}
+
+	if (currentExpression.size() > 0)
+	{
+		res->addParserNode(parseExpression(currentExpression, vars));
+	}
+
+	return res;
+}
+
+
+Parser::Parser(const ParserOperatorPriorities& priorities) : priorities(priorities)
 {
 }
 
-ExpressionParser::~ExpressionParser() {
+Parser::~Parser() {
 	// TODO Auto-generated destructor stub
 }
 

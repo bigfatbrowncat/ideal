@@ -13,7 +13,7 @@
 
 #include "lexer/LexerException.h"
 
-#include "parser/ExpressionParser.h"
+#include "parser/Parser.h"
 #include "parser/ParserException.h"
 
 #include <stdio.h>
@@ -46,18 +46,20 @@ int main(int argc, char** argv)
 		LexerTree formulaLexerTree(expression);		//"5* (-    x+((-(4))))"
 
 		ParserOperatorPriorities pop;
-		ExpressionParser formulaParser(pop);
+		Parser formulaParser(pop);
 
-		formulaRoot = formulaParser.parse(formulaLexerTree.getRoot(), vars);
+		formulaRoot = formulaParser.parseFlow(formulaLexerTree.getRoot().getInnerItems(), vars);
   	}
   	catch (const LexerException& lexerException)
   	{
   		printf("Lexer is asking for excuse. %s", lexerException.getMessage().c_str());
+  		fflush(stdout);
   		return -1;
   	}
   	catch (const ParserException& parserException)
   	{
   		printf("Parser is asking for excuse. %s", parserException.getMessage().c_str());
+  		fflush(stdout);
   		return -1;
   	}
 

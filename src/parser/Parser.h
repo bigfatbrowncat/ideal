@@ -23,17 +23,18 @@
 using namespace std;
 using namespace llvm;
 
-class ExpressionParser
+class Parser
 {
 private:
 	const ParserOperatorPriorities& priorities;
 
 public:
-	ExpressionParser(const ParserOperatorPriorities& priorities);
+	Parser(const ParserOperatorPriorities& priorities);
 
-	ParserNode* parse(const LexerTreeItem& source, ParserVariables& vars);
+	ParserNode* parseExpression(const list<LexerTreeItem>& source, ParserVariables& vars);
+	ParserNode* parseFlow(const list<LexerTreeItem>& source, ParserVariables& vars);
 
-	virtual ~ExpressionParser();
+	virtual ~Parser();
 };
 
 #endif /* FORMULAPARSER_H_ */

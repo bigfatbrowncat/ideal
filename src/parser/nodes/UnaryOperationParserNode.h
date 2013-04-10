@@ -17,7 +17,7 @@ private:
 	ParserNode *operand;
 	ParserOperator formulaOperator;
 public:
-	bool canBeAssigned()
+	bool canBeAssigned() const
 	{
 		return false;
 	}
@@ -29,7 +29,7 @@ public:
 
 	}
 
-	virtual Value* generateGetValueLLVMCode(IRBuilder<>& builder)
+	virtual Value* generateGetValueLLVMCode(IRBuilder<>& builder) const
 	{
 		Value* operandVal = operand->generateGetValueLLVMCode(builder);
 
@@ -47,7 +47,7 @@ public:
 		}
 	}
 
-	virtual Value* generateSetValueLLVMCode(Value* value, IRBuilder<>& builder)
+	virtual Value* generateSetValueLLVMCode(Value* value, IRBuilder<>& builder) const
 	{
 		return NULL;
 	}

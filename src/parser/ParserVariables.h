@@ -24,9 +24,9 @@ class ParserVariables
 private:
 	map<string, AllocaInst*> values;
 protected:
-	AllocaInst* getLLVMVariableIdentifier(const string& name)
+	AllocaInst* getLLVMVariableIdentifier(const string& name) const
 	{
-		map<string, AllocaInst*>::iterator iter = values.find(name);
+		map<string, AllocaInst*>::const_iterator iter = values.find(name);
 		if (iter == values.end())
 		{
 			throw UndefinedVariableParserException(name);
@@ -68,24 +68,24 @@ public:
 	}
 
 
-	StoreInst* generateLLVMVariableSetToConstantCode(const string& name, double value, IRBuilder<>& builder)
+	StoreInst* generateLLVMVariableSetToConstantCode(const string& name, double value, IRBuilder<>& builder) const
 	{
 		Type* doubleType = builder.getDoubleTy();
 		Value* xValue = ConstantFP::get(doubleType, value);
 		return builder.CreateStore(xValue, getLLVMVariableIdentifier(name));
 	}
 
-	StoreInst* generateLLVMVariableSetValueCode(const string& name, Value* value, IRBuilder<>& builder)
+	StoreInst* generateLLVMVariableSetValueCode(const string& name, Value* value, IRBuilder<>& builder) const
 	{
 		return builder.CreateStore(value, getLLVMVariableIdentifier(name));
 	}
 
-	LoadInst* generateLLVMVariableGetValueCode(const string& name, IRBuilder<>& builder)
+	LoadInst* generateLLVMVariableGetValueCode(const string& name, IRBuilder<>& builder) const
 	{
 		return builder.CreateLoad(getLLVMVariableIdentifier(name), name);
 	}
 
-	bool contains(const string& name)
+	bool contains(const string& name) const
 	{
 		return values.find(name) != values.end();
 	}
