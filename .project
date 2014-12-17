@@ -26,14 +26,9 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>llvm-3.2</name>
+			<name>llvm</name>
 			<type>2</type>
-			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/llvm-3.2</locationURI>
-		</link>
-		<link>
-			<name>llvm-3.2.src</name>
-			<type>2</type>
-			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/llvm-3.2.src</locationURI>
+			<locationURI>WORKSPACE_LOC/llvm-3.5.0.src</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

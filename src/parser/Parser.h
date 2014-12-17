@@ -11,9 +11,9 @@
 #include <map>
 #include <string>
 
-#include <llvm/Value.h>
-#include <llvm/IRBuilder.h>
-#include <llvm/Constants.h>
+#include <llvm/IR/Value.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/Constants.h>
 
 #include "../lexer/Lexer.h"
 #include "nodes/ParserNode.h"

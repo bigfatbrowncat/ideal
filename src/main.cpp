@@ -1,9 +1,9 @@
-#include "llvm/Constants.h"
-#include "llvm/DerivedTypes.h"
-#include "llvm/IRBuilder.h"
-#include "llvm/Instructions.h"
-#include "llvm/LLVMContext.h"
-#include "llvm/Module.h"
+#include "llvm/IR/Constants.h"
+#include "llvm/IR/DerivedTypes.h"
+#include "llvm/IR/IRBuilder.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/Module.h"
 #include "llvm/ExecutionEngine/JIT.h"
 #include "llvm/ExecutionEngine/Interpreter.h"
 #include "llvm/ExecutionEngine/GenericValue.h"
@@ -28,7 +28,7 @@ int main(int argc, char** argv)
 
 	if (argc != 2)
 	{
-		printf("Usage:\n   ideal <expression>");
+		printf("Usage:\n   ideal <expression>\n");
 		return -1;
 	}
 	else
@@ -66,16 +66,16 @@ int main(int argc, char** argv)
 	// ** Generating the code **
 
 	InitializeNativeTarget();
-	LLVMContext Context;
-	Type* doubleType = Type::getDoubleTy(getGlobalContext());
+	LLVMContext context;
+	Type* doubleType = Type::getDoubleTy(context);
 
 	// Creating the main module
-	Module *mainModule = new Module("Main", Context);
+	Module *mainModule = new Module("Main", context);
 
 	// Creating the main function
 	Function *mainFunction = cast<Function>(mainModule->getOrInsertFunction("main", doubleType, (Type *)0));
 
-	BasicBlock *mainFunctionEntryBlock = BasicBlock::Create(Context, "main_entry_block", mainFunction);
+	BasicBlock *mainFunctionEntryBlock = BasicBlock::Create(context, "main_entry_block", mainFunction);
 	IRBuilder<> builder(mainFunctionEntryBlock);
 
 	vars.generateVariableCreationLLVMCode("x", builder);
@@ -91,7 +91,7 @@ int main(int argc, char** argv)
 	ExecutionEngine* executionEngine = EngineBuilder(mainModule).create();
 
 	outs() << "We just constructed this LLVM module:\n\n" << *mainModule;
-	outs() << "\n\nRunning foo: ";
+	outs() << "\n\nRunning the main function: ";
 	outs().flush();
 
 	// Call the `foo' function with no arguments:

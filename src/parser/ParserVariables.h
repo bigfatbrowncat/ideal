@@ -11,8 +11,8 @@
 #include <map>
 #include <string>
 
-#include <llvm/Value.h>
-#include <llvm/IRBuilder.h>
+#include <llvm/IR/Value.h>
+#include <llvm/IR/IRBuilder.h>
 
 #include "ParserException.h"
 
