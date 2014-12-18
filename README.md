@@ -15,12 +15,12 @@ It requires llvm 3.5.0, so in order to build it you should:
 
 ## Using
 
-Usage: ideal <expression>
+Usage: `ideal <expression>`
    
 Expression will be translated into LLVM code, JIT-ed and executed. You can enter some expressions
-divided with semicolon. Expressions may contain "x" variable which is initialized with 12.3.
+divided with semicolon. Expressions may contain c-style variable declarations (only double type).
 
-For example
+For example,
 
 ```
 ./ideal "double y=1;double xx=y+1; return xx"
