@@ -79,7 +79,7 @@ void LexerTreeItem::doLexing(list<LexerTreeItem*>& nextIteration)
 				curState = number;
 				curItemText = innerText[i];
 			}
-			else if (isLetter(innerText[i]) || innerText[i] == '_')
+			else if (isValidFirstIdentifierChar(innerText[i]))
 			{
 				curState = ident;
 				curItemText = innerText[i];
@@ -105,7 +105,7 @@ void LexerTreeItem::doLexing(list<LexerTreeItem*>& nextIteration)
 				// Adding first brace char to next item
 				curItemText = innerText[i];
 			}
-			else if (isLetter(innerText[i]) || isDigit(innerText[i]) || innerText[i] == '_')
+			else if (isValidNonFirstIdentifierChar(innerText[i]))
 			{
 				// Still identifier
 				curItemText += innerText[i];

@@ -37,9 +37,10 @@ int main(int argc, char** argv)
 	}
 
   	ParserVariables vars;
-  	vars.define("x");
 
-  	ParserNode* formulaRoot;
+  	ParserNode* formulaRoot = NULL;
+  	Module* mainModule = NULL;
+  	ExecutionEngine* executionEngine = NULL;
   	try
   	{
 		// Parsing the formula
@@ -49,61 +50,62 @@ int main(int argc, char** argv)
 		Parser formulaParser(pop);
 
 		formulaRoot = formulaParser.parseFlow(formulaLexerTree.getRoot().getInnerItems(), vars);
+
+		InitializeNativeTarget();
+		LLVMContext context;
+		Type* doubleType = Type::getDoubleTy(context);
+
+		// Creating the main module
+		mainModule = new Module("Main", context);
+
+		// Creating the main function
+		Function *mainFunction = cast<Function>(mainModule->getOrInsertFunction("main", doubleType, (Type *)0));
+
+		BasicBlock *mainFunctionEntryBlock = BasicBlock::Create(context, "main_entry_block", mainFunction);
+		IRBuilder<> builder(mainFunctionEntryBlock);
+
+		// Generating our formula
+		Value* formulaVal = formulaRoot->generateGetValueLLVMCode(builder);
+
+		// Returning our formula result
+		//builder.CreateRet(formulaVal);
+
+		// ** Generating the code **
+
+		// Now we create the JIT.
+		executionEngine = EngineBuilder(mainModule).create();
+
+		outs() << "We just constructed this LLVM module:\n\n" << *mainModule;
+		outs() << "\n\nRunning the main function: ";
+		outs().flush();
+
+		// Call the `foo' function with no arguments:
+		std::vector<GenericValue> noargs;
+
+		GenericValue gv = executionEngine->runFunction(mainFunction, noargs);
+
+		// Import result of execution:
+		outs() << "Result: " << gv.DoubleVal << "\n";
+		executionEngine->freeMachineCodeForFunction(mainFunction);
+
   	}
   	catch (const LexerException& lexerException)
   	{
-  		printf("Lexer is asking for excuse. %s", lexerException.getMessage().c_str());
+  		printf("Lexer is asking for excuse. %s\n", lexerException.getMessage().c_str());
   		fflush(stdout);
   		return -1;
   	}
   	catch (const ParserException& parserException)
   	{
-  		printf("Parser is asking for excuse. %s", parserException.getMessage().c_str());
+  		printf("Parser is asking for excuse. %s\n", parserException.getMessage().c_str());
   		fflush(stdout);
   		return -1;
   	}
 
-	// ** Generating the code **
+  	if (formulaRoot != NULL) delete formulaRoot;
+  	/*if (mainModule != NULL) delete mainModule;
+  	if (executionEngine != NULL) delete executionEngine;*/
 
-	InitializeNativeTarget();
-	LLVMContext context;
-	Type* doubleType = Type::getDoubleTy(context);
-
-	// Creating the main module
-	Module *mainModule = new Module("Main", context);
-
-	// Creating the main function
-	Function *mainFunction = cast<Function>(mainModule->getOrInsertFunction("main", doubleType, (Type *)0));
-
-	BasicBlock *mainFunctionEntryBlock = BasicBlock::Create(context, "main_entry_block", mainFunction);
-	IRBuilder<> builder(mainFunctionEntryBlock);
-
-	vars.generateVariableCreationLLVMCode("x", builder);
-	vars.generateLLVMVariableSetToConstantCode("x", 12.3, builder);
-
-	// Generating our formula
-	Value* formulaVal = formulaRoot->generateGetValueLLVMCode(builder);
-
-	// Returning our formula result
-	builder.CreateRet(formulaVal);
-
-	// Now we create the JIT.
-	ExecutionEngine* executionEngine = EngineBuilder(mainModule).create();
-
-	outs() << "We just constructed this LLVM module:\n\n" << *mainModule;
-	outs() << "\n\nRunning the main function: ";
-	outs().flush();
-
-	// Call the `foo' function with no arguments:
-	std::vector<GenericValue> noargs;
-
-	GenericValue gv = executionEngine->runFunction(mainFunction, noargs);
-
-	// Import result of execution:
-	outs() << "Result: " << gv.DoubleVal << "\n";
-	executionEngine->freeMachineCodeForFunction(mainFunction);
-
-	delete executionEngine;
 	llvm_shutdown();
 	return 0;
 }

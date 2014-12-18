@@ -12,6 +12,8 @@
 #include "nodes/UnaryOperationParserNode.h"
 #include "nodes/ConstantParserNode.h"
 #include "nodes/VariableParserNode.h"
+#include "nodes/VariableDeclarationParserNode.h"
+#include "nodes/ReturnParserNode.h"
 #include "nodes/ExecutionFlowParserNode.h"
 
 struct ParserItemWrapper
@@ -205,27 +207,111 @@ ParserNode* Parser::parseExpression(const list<LexerTreeItem*>& source, ParserVa
 	return items.front().parserOperand;
 }
 
+ParserNode* Parser::parseLine(const list<LexerTreeItem*>& source, ParserVariables& vars)
+{
+	// Checking if we have a variable declaration
+	list<LexerTreeItem*>::const_iterator iter = source.begin();
+	if ((*iter)->getInnerText() == "double")
+	{
+		iter++;
+		if (iter != source.end())
+		{
+			if ((*iter)->isValidVariable())
+			{
+				string variableName = (*iter)->getInnerText();
+				if (!vars.contains(variableName))
+				{
+					ParserNode* initNode;
+
+					iter++;
+					if (iter != source.end())
+					{
+						if ((*iter)->getInnerText() == "=")
+						{
+							iter++;
+							list<LexerTreeItem*> currentLineCopy;
+							while (iter != source.end())
+							{
+								currentLineCopy.push_back(*iter);
+								iter++;
+							}
+
+							initNode = parseExpression(currentLineCopy, vars);
+						}
+						else
+						{
+							throw new ParserException("Is this a variable initialization? Then '=' expected.");
+						}
+					}
+					else
+					{
+						initNode = NULL;	// No definition
+					}
+
+					vars.define(variableName);
+					return new VariableDeclarationParserNode(variableName, 0.0, initNode, vars);
+				}
+				else
+				{
+					throw ParserException(((string)"Variable '") + (*iter)->getInnerText() + "' is already defined");
+				}
+			}
+			else
+			{
+				throw ParserException(((string)"Invalid variable name: '") + (*iter)->getInnerText() + "'");
+			}
+		}
+		else
+		{
+			throw ParserException("Missing variable name in the declaration");
+		}
+	}
+	else if ((*iter)->getInnerText() == "return")
+	{
+		iter++;
+		if (iter != source.end())
+		{
+			list<LexerTreeItem*> currentLineCopy;
+			while (iter != source.end())
+			{
+				currentLineCopy.push_back(*iter);
+				iter++;
+			}
+			return new ReturnParserNode(ReturnParserNode::Expression, parseExpression(currentLineCopy, vars), vars);
+		}
+		else
+		{
+			throw ParserException("Missing expression after 'return'");
+		}
+	}
+	else
+	{
+		return parseExpression(source, vars);
+	}
+}
+
 ParserNode* Parser::parseFlow(const list<LexerTreeItem*>& source, ParserVariables& vars)
 {
 	ExecutionFlowParserNode* res = new ExecutionFlowParserNode(vars);
-	list<LexerTreeItem*> currentExpression;
+	list<LexerTreeItem*> currentLine;
 
 	for (list<LexerTreeItem*>::const_iterator iter = source.begin(); iter != source.end(); iter++)
 	{
 		if ((*iter)->getInnerText() == ";")
 		{
-			res->addParserNode(parseExpression(currentExpression, vars));
-			currentExpression.clear();
+			res->addParserNode(parseLine(currentLine, vars));
+			currentLine.clear();
 		}
 		else
 		{
-			currentExpression.push_back(*iter);
+			currentLine.push_back(*iter);
 		}
 	}
 
-	if (currentExpression.size() > 0)
+	// And the last line...
+	if (currentLine.size() > 0)
 	{
-		res->addParserNode(parseExpression(currentExpression, vars));
+		res->addParserNode(parseLine(currentLine, vars));
 	}
 
 	return res;

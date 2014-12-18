@@ -85,6 +85,11 @@ public:
 		return builder.CreateLoad(getLLVMVariableIdentifier(name), name);
 	}
 
+	ReturnInst* generateReturn(const string& name, IRBuilder<>& builder) const
+	{
+		return builder.CreateRet(getLLVMVariableIdentifier(name));
+	}
+
 	bool contains(const string& name) const
 	{
 		return values.find(name) != values.end();

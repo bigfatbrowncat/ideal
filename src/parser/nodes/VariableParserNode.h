@@ -25,9 +25,9 @@ public:
 		return getVariables().generateLLVMVariableGetValueCode(name, builder);
 	}
 
-	virtual Value* generateSetValueLLVMCode(Value* value, IRBuilder<>& builder) const
+	virtual void generateSetValueLLVMCode(Value* value, IRBuilder<>& builder) const
 	{
-		return getVariables().generateLLVMVariableSetValueCode(name, value, builder);
+		getVariables().generateLLVMVariableSetValueCode(name, value, builder);
 	}
 
 	VariableParserNode(string name, ParserVariables& vars) : ParserNode(vars), name(name)

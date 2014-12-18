@@ -22,7 +22,10 @@ divided with semicolon. Expressions may contain "x" variable which is initialize
 
 For example
 
-`./ideal "x = x + 2; x / 2"` will produce output
+```
+./ideal "double y=1;double xx=y+1; return xx"
+``` 
+will produce output
 
 ```
 We just constructed this LLVM module:
@@ -32,17 +35,16 @@ target datalayout = "e-m:o-i64:64-f80:128-n8:16:32:64-S128"
 
 define double @main() {
 main_entry_block:
-  %x = alloca double
-  store double 1.230000e+01, double* %x
-  %x1 = load double* %x
-  %addop = fadd double %x1, 2.000000e+00
-  store double %addop, double* %x
-  %x2 = load double* %x
-  %x3 = load double* %x
-  %divop = fdiv double %x3, 2.000000e+00
-  ret double %divop
+  %y = alloca double
+  store double 1.000000e+00, double* %y
+  %y1 = load double* %y
+  %addop = fadd double %y1, 1.000000e+00
+  %xx = alloca double
+  store double %addop, double* %xx
+  %xx2 = load double* %xx
+  ret double %xx2
 }
 
 
-Running the main function: Result: 7.150000e+00
+Running the main function: Result: 2.000000e+00
 ```

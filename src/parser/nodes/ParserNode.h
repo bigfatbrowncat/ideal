@@ -24,12 +24,12 @@ private:
 	ParserVariables& vars;
 protected:
 	ParserNode(ParserVariables& vars) : vars(vars) {}
-	virtual ~ParserNode() {}
 public:
 	virtual bool canBeAssigned() const = 0;
 	virtual Value* generateGetValueLLVMCode(IRBuilder<>& builder) const = 0;
-	virtual Value* generateSetValueLLVMCode(Value* value, IRBuilder<>& builder) const = 0;
+	virtual void generateSetValueLLVMCode(Value* value, IRBuilder<>& builder) const = 0;
 	ParserVariables& getVariables() const { return vars; }
+	virtual ~ParserNode() {}
 };
 
 

@@ -21,9 +21,8 @@ public:
 		return false;
 	}
 
-	virtual Value* generateSetValueLLVMCode(Value* value, IRBuilder<>& builder) const
+	virtual void generateSetValueLLVMCode(Value* value, IRBuilder<>& builder) const
 	{
-		return NULL;
 	}
 
 	virtual Value* generateGetValueLLVMCode(IRBuilder<>& builder) const

@@ -11,6 +11,8 @@
 #include <list>
 #include <string>
 
+#include "LexerTools.h"
+
 using namespace std;
 
 enum Brace { brNone, brRound, brSquare, brCurly };
@@ -21,37 +23,6 @@ private:
 	string innerText;
 	list<LexerTreeItem*> innerItems;
 	Brace outerBraces;
-
-	bool isDigit(char ch)
-	{
-		return (ch >= '0' && ch <= '9');
-	}
-
-	bool isDot(char ch)
-	{
-		return ch == '.';
-	}
-
-	bool isLetter(char ch)
-	{
-		return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z');
-	}
-
-	bool isOperator(char ch)
-	{
-		return (ch == '+') || (ch == '-') || (ch == '*') || (ch == '/') || (ch == '^') || (ch == '=') || (ch == ';');
-	}
-
-	bool isWhitespace(char ch)
-	{
-		return (ch == ' ') || (ch == '\t') || (ch == '\r') || (ch == '\n');
-	}
-
-	// This function is used for lexing double-char operators such as '+=', '-=', '*=', '/='
-	bool isValidWithEq(char ch)
-	{
-		return (ch == '+') || (ch == '-') || (ch == '*') || (ch == '/');
-	}
 
 	void extractBraces()
 	{
@@ -88,6 +59,20 @@ public:
 	const string& getInnerText() const { return innerText; }
 	const list<LexerTreeItem*>& getInnerItems() const { return innerItems; }
 	Brace getOuterBraces() const { return outerBraces; }
+	bool isValidVariable()
+	{
+		if (innerText.length() > 0) {
+			if (isValidFirstIdentifierChar(innerText[0])) {
+				for (int i = 1; i < innerText.length(); i++) {
+					if (!isValidNonFirstIdentifierChar(innerText[i])) {
+						return false;
+					}
+				}
+				return true;
+			}
+		}
+		return false;
+	}
 
 	void doLexing(list<LexerTreeItem*>& nextIteration);
 };
