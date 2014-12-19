@@ -28,7 +28,7 @@
 		<link>
 			<name>llvm</name>
 			<type>2</type>
-			<locationURI>WORKSPACE_LOC/llvm-3.5.0.src</locationURI>
+			<locationURI>PARENT-1-WORKSPACE_LOC/llvm-3.5.0.src</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
