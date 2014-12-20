@@ -12,7 +12,7 @@
 #include "nodes/UnaryOperationParserNode.h"
 #include "nodes/ConstantParserNode.h"
 #include "nodes/VariableParserNode.h"
-#include "nodes/VariableDeclarationParserNode.h"
+#include "nodes/DoubleVariableDeclarationParserNode.h"
 #include "nodes/ReturnParserNode.h"
 #include "nodes/ExecutionFlowParserNode.h"
 
@@ -97,9 +97,9 @@ ParserNode* Parser::parseExpression(const list<LexerTreeItem*>& source, ParserVa
 			items.push_back(ParserItemWrapper::withOperand(cfi));
 			previousIsOperand = true;
 		}
-		else if (vars.contains((*iter)->getInnerText()))
+		else if (vars.contains((*iter)->getInnerText(), ParserVariables::Variable::tDouble))
 		{
-			VariableParserNode* vfi = new VariableParserNode((*iter)->getInnerText(), vars);
+			VariableParserNode* vfi = new VariableParserNode((*iter)->getInnerText(), ParserVariables::Variable::tDouble, vars);
 			items.push_back(ParserItemWrapper::withOperand(vfi));
 			previousIsOperand = true;
 		}
@@ -219,7 +219,7 @@ ParserNode* Parser::parseLine(const list<LexerTreeItem*>& source, ParserVariable
 			if ((*iter)->isValidVariable())
 			{
 				string variableName = (*iter)->getInnerText();
-				if (!vars.contains(variableName))
+				if (!vars.contains(variableName, ParserVariables::Variable::tDouble))
 				{
 					ParserNode* initNode;
 
@@ -248,8 +248,8 @@ ParserNode* Parser::parseLine(const list<LexerTreeItem*>& source, ParserVariable
 						initNode = NULL;	// No definition
 					}
 
-					vars.define(variableName);
-					return new VariableDeclarationParserNode(variableName, 0.0, initNode, vars);
+					vars.define(variableName, ParserVariables::Variable::tDouble);
+					return new DoubleVariableDeclarationParserNode(variableName, 0.0, initNode, vars);
 				}
 				else
 				{

@@ -36,11 +36,11 @@ public:
 	}
 };
 
-class VariableRedifinitionParserException : public ParserException
+class InvalidVariableTypeParserException : public ParserException
 {
 public:
-	VariableRedifinitionParserException(const string& variableName) :
-		ParserException(string("Variable redifinition: ") + variableName)
+	InvalidVariableTypeParserException(const string& variableName) :
+		ParserException(string("Invalid variable type: ") + variableName)
 	{
 	}
 };
@@ -50,6 +50,15 @@ class VariableCreationCodeGeneratedParserException : public ParserException
 public:
 	VariableCreationCodeGeneratedParserException(const string& variableName) :
 		ParserException(string("Variable creation code is already generated: ") + variableName)
+	{
+	}
+};
+
+class VariableRedifinitionParserException : public ParserException
+{
+public:
+	VariableRedifinitionParserException(const string& variableName) :
+		ParserException(string("Variable redifinition: ") + variableName)
 	{
 	}
 };

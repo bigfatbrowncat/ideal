@@ -14,6 +14,7 @@ class VariableParserNode : public ParserNode
 {
 private:
 	string name;
+	ParserVariables::Variable::Type type;
 public:
 	bool canBeAssigned() const
 	{
@@ -22,15 +23,16 @@ public:
 
 	virtual Value* generateGetValueLLVMCode(IRBuilder<>& builder) const
 	{
-		return getVariables().generateLLVMVariableGetValueCode(name, builder);
+		return getVariables().generateLLVMVariableGetValueCode(name, type, builder);
 	}
 
 	virtual void generateSetValueLLVMCode(Value* value, IRBuilder<>& builder) const
 	{
-		getVariables().generateLLVMVariableSetValueCode(name, value, builder);
+		getVariables().generateLLVMVariableSetValueCode(name, type, value, builder);
 	}
 
-	VariableParserNode(string name, ParserVariables& vars) : ParserNode(vars), name(name)
+	VariableParserNode(string name, ParserVariables::Variable::Type type, ParserVariables& vars) :
+		ParserNode(vars), name(name), type(type)
 	{
 
 	}

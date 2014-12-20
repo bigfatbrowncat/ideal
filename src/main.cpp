@@ -67,10 +67,7 @@ int main(int argc, char** argv)
 		// Generating our formula
 		Value* formulaVal = formulaRoot->generateGetValueLLVMCode(builder);
 
-		// Returning our formula result
-		//builder.CreateRet(formulaVal);
-
-		// ** Generating the code **
+		// ** JITing and executing **
 
 		// Now we create the JIT.
 		executionEngine = EngineBuilder(mainModule).create();

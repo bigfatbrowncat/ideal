@@ -5,5 +5,5 @@
  *      Author: imizus
  */
 
-#include "VariableDeclarationParserNode.h"
+#include "DoubleVariableDeclarationParserNode.h"
 
