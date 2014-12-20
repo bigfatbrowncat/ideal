@@ -299,7 +299,14 @@ ParserNode* Parser::parseFlow(const list<LexerTreeItem*>& source, ParserVariable
 	{
 		if ((*iter)->getInnerText() == ";")
 		{
-			res->addParserNode(parseLine(currentLine, vars));
+			if (currentLine.size() > 0)
+			{
+				res->addParserNode(parseLine(currentLine, vars));
+			}
+			else
+			{
+				// Empty operator. Just doing nothing
+			}
 			currentLine.clear();
 		}
 		else

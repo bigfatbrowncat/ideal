@@ -150,12 +150,12 @@ void LexerTreeItem::doLexing(list<LexerTreeItem*>& nextIteration)
 			}
 			else if (isOperator(innerText[i]))
 			{
-				if (curItemText.length() == 0 || curItemText[curItemText.length() - 1] == innerText[i])
+				if (curItemText.length() == 0 || (curItemText[curItemText.length() - 1] == innerText[i] && isValidOpDouble(innerText[i])))
 				{
 					// The same operator symbol (i.e. +, ++, --, ** etc...)
 					curItemText += innerText[i];
 				}
-				else if (innerText[i] == '=' && curItemText.length() > 0 && isValidWithEq(curItemText[curItemText.length() - 1]))
+				else if (innerText[i] == '=' && curItemText.length() > 0 && isValidOpWithEq(curItemText[curItemText.length() - 1]))
 				{
 					// Operator op= (i.e. += -= *= /= etc...)
 					curItemText += innerText[i];

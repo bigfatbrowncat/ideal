@@ -35,7 +35,7 @@ static bool isValidNonFirstIdentifierChar(char ch)
 
 static bool isOperator(char ch)
 {
-	return (ch == '+') || (ch == '-') || (ch == '*') || (ch == '/') || (ch == '^') || (ch == '=') || (ch == ';');
+	return (ch == '+') || (ch == '-') || (ch == '*') || (ch == '/') || (ch == '=') || (ch == ';');
 }
 
 static bool isWhitespace(char ch)
@@ -44,9 +44,16 @@ static bool isWhitespace(char ch)
 }
 
 // This function is used for lexing double-char operators such as '+=', '-=', '*=', '/='
-static bool isValidWithEq(char ch)
+static bool isValidOpWithEq(char ch)
 {
 	return (ch == '+') || (ch == '-') || (ch == '*') || (ch == '/');
 }
+
+// This function is used for lexing double-char operators such as '++', '--', '=='
+static bool isValidOpDouble(char ch)
+{
+	return (ch == '+') || (ch == '-') || (ch == '=');
+}
+
 
 #endif /* LEXERTOOLS_H_ */
