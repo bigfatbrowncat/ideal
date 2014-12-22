@@ -13,7 +13,16 @@
 class ConstantParserNode : public ParserNode
 {
 private:
-	double value;
+	double doubleVal;
+	bool boolVal;
+	DataType dataType;
+
+protected:
+	ConstantParserNode(DataType dataType, double doubleVal, bool boolVal, ParserVariables& vars) :
+		ParserNode(vars), doubleVal(doubleVal), boolVal(boolVal), dataType(dataType)
+	{
+	}
+
 public:
 	bool canBeAssigned() const
 	{
@@ -22,26 +31,57 @@ public:
 
 	virtual Value* generateGetValueLLVMCode(IRBuilder<>& builder) const
 	{
-		Type* doubleType = builder.getDoubleTy();
-		return ConstantFP::get(doubleType, value);
+		if (getActualType() == tDouble)
+		{
+			Type* doubleType = builder.getDoubleTy();
+			return ConstantFP::get(doubleType, doubleVal);
+		}
+		else
+		{
+			Type* boolType = builder.getInt1Ty();
+			return boolVal ? ConstantInt::getTrue(boolType) : ConstantInt::getFalse(boolType);
+		}
 	}
 
 	virtual void generateSetValueLLVMCode(Value* value, IRBuilder<>& builder) const
 	{
 	}
 
-	ConstantParserNode(double value, ParserVariables& vars) : ParserNode(vars), value(value)
+	virtual set<DataType> getSupportedTypes() const
 	{
-
+		set<DataType> res;
+		res.insert(dataType);
+		return res;
 	}
 
-	static ConstantParserNode parse(string str, ParserVariables& vars)
+	static ConstantParserNode parseDouble(const string& str, ParserVariables& vars)
 	{
 		double res = atof(str.c_str());
-		return ConstantParserNode(res, vars);
+		return ConstantParserNode(tDouble, res, false, vars);
 	}
 
-	static bool isParsable(string str)
+	static ConstantParserNode parseBoolean(const string& str, ParserVariables& vars)
+	{
+		if (str == "true")
+		{
+			return ConstantParserNode(tBoolean, 0, true, vars);
+		}
+		else if (str == "false")
+		{
+			return ConstantParserNode(tBoolean, 0, false, vars);
+		}
+		else
+		{
+			throw InvalidTokenParserException(str);
+		}
+	}
+
+	static bool isBooleanConstant(const string& str)
+	{
+		return (str == "true") || (str == "false");
+	}
+
+	static bool isDoubleConstant(const string& str)
 	{
 		bool dotFound = false;
 		for (size_t i = 0; i < str.length(); i++)

@@ -45,6 +45,15 @@ public:
 	}
 };
 
+class TypeMismatchParserException : public ParserException
+{
+public:
+	TypeMismatchParserException(const string& message) :
+		ParserException(message)
+	{
+	}
+};
+
 class VariableCreationCodeGeneratedParserException : public ParserException
 {
 public:

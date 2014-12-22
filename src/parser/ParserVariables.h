@@ -15,6 +15,7 @@
 #include <llvm/IR/IRBuilder.h>
 
 #include "ParserException.h"
+#include "DataType.h"
 
 using namespace std;
 using namespace llvm;
@@ -24,11 +25,9 @@ class ParserVariables
 public:
 	struct Variable
 	{
-		enum Type { tDouble, tBoolean };
-
-		Type type;
+		DataType type;
 		AllocaInst* value;
-		Variable(Type type, AllocaInst* value) : type(type), value(value) {}
+		Variable(DataType type, AllocaInst* value) : type(type), value(value) {}
 	};
 private:
 	map<string, Variable> values;
@@ -47,17 +46,7 @@ protected:
 		}
 	}
 public:
-	static Type* variableTypeToLLVMType(Variable::Type vt, IRBuilder<>& builder) {
-		switch (vt)
-		{
-		case Variable::tDouble:
-			return builder.getDoubleTy();
-		case Variable::tBoolean:
-			return builder.getInt1Ty();
-		}
-	}
-
-	void define(const string& name, Variable::Type type) {
+	void define(const string& name, DataType type) {
 		if (values.find(name) == values.end())
 		{
 			values.insert(pair<string, Variable>(name, Variable(type, NULL)));
@@ -68,7 +57,7 @@ public:
 		}
 	}
 
-	void generateVariableCreationLLVMCode(const string& name, Variable::Type type, IRBuilder<>& builder)
+	void generateVariableCreationLLVMCode(const string& name, DataType type, IRBuilder<>& builder)
 	{
 		map<string, Variable>::iterator iter = values.find(name);
 		if (iter != values.end() && (*iter).second.type == type)
@@ -91,7 +80,7 @@ public:
 	StoreInst* generateLLVMVariableBooleanSetToConstantCode(const string& name, bool value, IRBuilder<>& builder) const
 	{
 		const Variable& var = getLLVMVariableIdentifier(name);
-		if (var.type == Variable::tBoolean)
+		if (var.type == tBoolean)
 		{
 			Type* booleanType = builder.getInt1Ty();
 			Value* xValue = value ? ConstantInt::getTrue(booleanType) : ConstantInt::getFalse(booleanType);
@@ -106,7 +95,7 @@ public:
 	StoreInst* generateLLVMVariableDoubleSetToConstantCode(const string& name, double value, IRBuilder<>& builder) const
 	{
 		const Variable& var = getLLVMVariableIdentifier(name);
-		if (var.type == Variable::tDouble)
+		if (var.type == tDouble)
 		{
 			Type* doubleType = builder.getDoubleTy();
 			Value* xValue = ConstantFP::get(doubleType, value);
@@ -118,7 +107,7 @@ public:
 		}
 	}
 
-	StoreInst* generateLLVMVariableSetValueCode(const string& name, Variable::Type type, Value* value, IRBuilder<>& builder) const
+	StoreInst* generateLLVMVariableSetValueCode(const string& name, DataType type, Value* value, IRBuilder<>& builder) const
 	{
 		if (getLLVMVariableIdentifier(name).type == type)
 		{
@@ -130,7 +119,7 @@ public:
 		}
 	}
 
-	LoadInst* generateLLVMVariableGetValueCode(const string& name, Variable::Type type, IRBuilder<>& builder) const
+	LoadInst* generateLLVMVariableGetValueCode(const string& name, DataType type, IRBuilder<>& builder) const
 	{
 		if (getLLVMVariableIdentifier(name).type == type)
 		{
@@ -142,7 +131,7 @@ public:
 		}
 	}
 
-	bool contains(const string& name, Variable::Type type) const
+	bool contains(const string& name, DataType type) const
 	{
 		map<string, Variable>::const_iterator iter = values.find(name);
 		return iter != values.end() && iter->second.type == type;

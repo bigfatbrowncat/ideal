@@ -48,6 +48,11 @@ public:
 	{
 	}
 
+	virtual set<DataType> getSupportedTypes() const
+	{
+		return set<DataType>();
+	}
+
 	ReturnParserNode(Type type, ParserNode* node, ParserVariables& vars) :
 		ParserNode(vars), type(type), node(node)
 	{

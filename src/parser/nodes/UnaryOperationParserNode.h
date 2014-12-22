@@ -22,13 +22,6 @@ public:
 		return false;
 	}
 
-	UnaryOperationParserNode(ParserNode *operand, ParserOperator formulaOperator, ParserVariables& vars) :
-		ParserNode(vars),
-		operand(operand), formulaOperator(formulaOperator)
-	{
-
-	}
-
 	virtual Value* generateGetValueLLVMCode(IRBuilder<>& builder) const
 	{
 		Value* operandVal = operand->generateGetValueLLVMCode(builder);
@@ -49,6 +42,18 @@ public:
 
 	virtual void generateSetValueLLVMCode(Value* value, IRBuilder<>& builder) const
 	{
+	}
+
+	virtual set<DataType> getSupportedTypes() const
+	{
+		return operand->getSupportedTypes();
+	}
+
+	UnaryOperationParserNode(ParserNode *operand, ParserOperator formulaOperator, ParserVariables& vars) :
+		ParserNode(vars),
+		operand(operand), formulaOperator(formulaOperator)
+	{
+
 	}
 
 };

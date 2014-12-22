@@ -12,6 +12,7 @@ enum ParserOperator
 {
 	foNegate,
 	foAdd, foSubtract, foMultiply, foDivide,
+	foGreater, foLower, foGreaterEqual, foLowerEqual, foEqual, foNonEqual,
 	foEquate
 };
 

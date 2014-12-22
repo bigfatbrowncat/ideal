@@ -46,6 +46,12 @@ public:
 	{
 	}
 
+	virtual set<DataType> getSupportedTypes() const
+	{
+		return set<DataType>();
+	}
+
+
 	virtual ~ExecutionFlowParserNode();
 };
 

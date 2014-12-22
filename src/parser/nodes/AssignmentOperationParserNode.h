@@ -8,6 +8,8 @@
 #ifndef ASSIGNOPERATIONPARSERNODE_H_
 #define ASSIGNOPERATIONPARSERNODE_H_
 
+#include <iterator>
+
 #include "ParserNode.h"
 
 class AssignmentOperationParserNode : public ParserNode
@@ -45,6 +47,22 @@ public:
 			return NULL;
 		}
 
+	}
+
+	virtual set<DataType> getSupportedTypes() const
+	{
+		set<DataType> s1 = first->getSupportedTypes();
+		set<DataType> s2 = second->getSupportedTypes();
+		set<DataType> res;
+		set_intersection(s1.begin(), s1.end(), s2.begin(), s2.end(), insert_iterator<set<DataType>>(res, res.begin()));
+		return res;
+	}
+
+	virtual void setActualType(DataType actualType)
+	{
+		ParserNode::setActualType(actualType);
+		first->setActualType(actualType);
+		second->setActualType(actualType);
 	}
 
 	AssignmentOperationParserNode(ParserNode* first, ParserNode* second, ParserVariables& vars) :

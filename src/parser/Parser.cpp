@@ -12,7 +12,7 @@
 #include "nodes/UnaryOperationParserNode.h"
 #include "nodes/ConstantParserNode.h"
 #include "nodes/VariableParserNode.h"
-#include "nodes/DoubleVariableDeclarationParserNode.h"
+#include "nodes/VariableDeclarationParserNode.h"
 #include "nodes/ReturnParserNode.h"
 #include "nodes/ExecutionFlowParserNode.h"
 
@@ -91,15 +91,15 @@ ParserNode* Parser::parseExpression(const list<LexerTreeItem*>& source, ParserVa
 			items.push_back(ParserItemWrapper::withOperand(parseFlow((*iter)->getInnerItems(), vars)));
 			previousIsOperand = true;
 		}
-		else if (ConstantParserNode::isParsable((*iter)->getInnerText()))
+		else if (ConstantParserNode::isDoubleConstant((*iter)->getInnerText()))
 		{
-			ConstantParserNode* cfi = new ConstantParserNode(ConstantParserNode::parse((*iter)->getInnerText(), vars));
+			ConstantParserNode* cfi = new ConstantParserNode(ConstantParserNode::parseDouble((*iter)->getInnerText(), vars));
 			items.push_back(ParserItemWrapper::withOperand(cfi));
 			previousIsOperand = true;
 		}
-		else if (vars.contains((*iter)->getInnerText(), ParserVariables::Variable::tDouble))
+		else if (vars.contains((*iter)->getInnerText(), tDouble))
 		{
-			VariableParserNode* vfi = new VariableParserNode((*iter)->getInnerText(), ParserVariables::Variable::tDouble, vars);
+			VariableParserNode* vfi = new VariableParserNode((*iter)->getInnerText(), tDouble, vars);
 			items.push_back(ParserItemWrapper::withOperand(vfi));
 			previousIsOperand = true;
 		}
@@ -161,9 +161,10 @@ ParserNode* Parser::parseExpression(const list<LexerTreeItem*>& source, ParserVa
 				throw OperandWantedParserException();
 			}
 
-			UnaryOperationParserNode* fuo = new UnaryOperationParserNode(items[highest_priority_index + 1].parserOperand,
-			                                                       items[highest_priority_index].parserOperator,
-			                                                       vars);
+			UnaryOperationParserNode* fuo = new UnaryOperationParserNode(
+			        items[highest_priority_index + 1].parserOperand,
+			        items[highest_priority_index].parserOperator,
+			        vars);
 			items.erase(items.begin() + highest_priority_index + 1);
 			items[highest_priority_index] = ParserItemWrapper::withOperand(fuo);
 		}
@@ -219,7 +220,7 @@ ParserNode* Parser::parseLine(const list<LexerTreeItem*>& source, ParserVariable
 			if ((*iter)->isValidVariable())
 			{
 				string variableName = (*iter)->getInnerText();
-				if (!vars.contains(variableName, ParserVariables::Variable::tDouble))
+				if (!vars.contains(variableName, tDouble))
 				{
 					ParserNode* initNode;
 
@@ -237,10 +238,21 @@ ParserNode* Parser::parseLine(const list<LexerTreeItem*>& source, ParserVariable
 							}
 
 							initNode = parseExpression(currentLineCopy, vars);
+							// Checking type compatibility
+							set<DataType> rightSideTypes = initNode->getSupportedTypes();
+							if (rightSideTypes.find(tDouble) != rightSideTypes.end())
+							{
+								// Theright side is compatible with double type
+								initNode->setActualType(tDouble);
+							}
+							else
+							{
+								throw TypeMismatchParserException(string("Incompatible types between the variable ") + variableName + " and its initialization value");
+							}
 						}
 						else
 						{
-							throw new ParserException("Is this a variable initialization? Then '=' expected.");
+							throw ParserException("Is this a variable initialization? Then '=' expected.");
 						}
 					}
 					else
@@ -248,8 +260,8 @@ ParserNode* Parser::parseLine(const list<LexerTreeItem*>& source, ParserVariable
 						initNode = NULL;	// No definition
 					}
 
-					vars.define(variableName, ParserVariables::Variable::tDouble);
-					return new DoubleVariableDeclarationParserNode(variableName, 0.0, initNode, vars);
+					vars.define(variableName, tDouble);
+					return new VariableDeclarationParserNode(variableName, tDouble, 0.0, false, initNode, vars);
 				}
 				else
 				{
@@ -277,7 +289,21 @@ ParserNode* Parser::parseLine(const list<LexerTreeItem*>& source, ParserVariable
 				currentLineCopy.push_back(*iter);
 				iter++;
 			}
-			return new ReturnParserNode(ReturnParserNode::Expression, parseExpression(currentLineCopy, vars), vars);
+			// TODO Take the actual return type from the function declaration
+			DataType returnType = tDouble;
+
+			ParserNode* res = parseExpression(currentLineCopy, vars);
+			set<DataType> resTypes = res->getSupportedTypes();
+			if (resTypes.find(returnType) != resTypes.end())
+			{
+				res->setActualType(returnType);
+			}
+			else
+			{
+				throw TypeMismatchParserException("Invalid return type");
+			}
+
+			return new ReturnParserNode(ReturnParserNode::Expression, res, vars);
 		}
 		else
 		{
@@ -286,7 +312,19 @@ ParserNode* Parser::parseLine(const list<LexerTreeItem*>& source, ParserVariable
 	}
 	else
 	{
-		return parseExpression(source, vars);
+		ParserNode* res = parseExpression(source, vars);
+		set<DataType> resTypes = res->getSupportedTypes();
+		if (resTypes.size() > 0)
+		{
+			// If we have at least one type, setting the first one as the actual.
+			res->setActualType(*resTypes.begin());
+			return res;
+		}
+		else
+		{
+			throw TypeMismatchParserException("We have a type incompatibility here");
+		}
+
 	}
 }
 
